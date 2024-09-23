@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id_user String @id @unique @default(uuid()) @db.Char(36)
+  cpf     String @unique @db.Char(14)
+  senha   String @db.VarChar(38)
+  nome    String @db.VarChar(102)
+  tipo    String @db.VarChar(15)
+  email   String @unique @db.VarChar(258)
+
+  Cliente Cliente[] // Relacionamento de 1 para muitos (um usuário pode administrar vários clientes)
+}
+
+model Cliente {
+  id_cliente        String   @id @unique @default(uuid()) @db.Char(36)
+  cpf               String   @unique @db.VarChar(14)
+  data_nasc         DateTime
+  nome              String   @db.VarChar(102)
+  dupla_nacio       Boolean
+  est_civil         String   @db.VarChar(20)
+  reg_bens          String   @db.VarChar(30)
+  res_fiscal_brasil Boolean
+  email             String   @db.VarChar(258)
+  profissao         String   @db.VarChar(258)
+  id_user           String   @db.Char(36)
+  user              Usuario  @relation(fields: [id_user], references: [id_user])
+
+  Familiar     Familiar[]
+  Investimento Investimento[]
+}
+
+model Familiar {
+  id_familiar String   @id @unique @default(uuid()) @db.Char(36)
+  cpf         String   @unique @db.Char(14)
+  est_civil   String   @db.VarChar(20)
+  nome        String   @db.VarChar(102)
+  data_nasc   DateTime
+  vivo        Boolean
+  nome_conj   String?  @db.VarChar(102)
+  id_cliente  String   @db.Char(36)
+  cliente     Cliente  @relation(fields: [id_cliente], references: [id_cliente])
+  parentesco  String   @db.VarChar(30)
+}
+
+model Investimento {
+  id_invest      String   @id @unique @default(uuid()) @db.Char(36)
+  id_cliente     String   @db.Char(36)
+  cliente        Cliente  @relation(fields: [id_cliente], references: [id_cliente])
+  banco          String   @db.VarChar(40)
+  agencia        String   @db.VarChar(15)
+  conta          String   @db.VarChar(17)
+  classe         String   @db.VarChar(50)
+  sub_classe_atv String   @db.VarChar(30)
+  setor_ativ     String   @db.VarChar(50)
+  liquidez       String   @db.VarChar(20)
+  data_aplic     DateTime
+  data_venc      DateTime
+  indice         String   @db.VarChar(20)
+  porc_indice    Float
+  pre_fixado     Float
+  isento         Boolean
+  pais           String   @db.VarChar(30)
+  valor          Float
+}
+
+model Indices {
+  nome  String @id @db.VarChar(10)
+  valor Float
+}
+
+model ConsolidadoInvestimento {
+  id_consolidado String @id @default(uuid()) @db.Char(36)
+  valuation      Float
+  rent_bruta     Float
+  rent_objetivo  Float
+  rent_relativa  Float
+}

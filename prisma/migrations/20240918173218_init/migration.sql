@@ -1,0 +1,8 @@
+-- AlterTable
+ALTER TABLE "Cliente" ALTER COLUMN "cpf" SET DATA TYPE VARCHAR(14);
+
+-- AlterTable
+ALTER TABLE "Familiar" ALTER COLUMN "cpf" SET DATA TYPE CHAR(14);
+
+-- AlterTable
+ALTER TABLE "Usuario" ALTER COLUMN "cpf" SET DATA TYPE CHAR(14);
