@@ -77,8 +77,9 @@ model Investimento {
 }
 
 model Indices {
-  nome  String @id @db.VarChar(10)
-  valor Float
+  id_indice String @id @unique @default(uuid())
+  nome      String @unique @db.VarChar(30)
+  valor     Float
 }
 
 model ConsolidadoInvestimento {

@@ -39,8 +39,12 @@ export default function PartnerForm() {
     }
 
     return (
+
         <main className="bg-gray-50 min-h-screen p-6 flex justify-center items-center">
+
             <div className="bg-white p-8 shadow-md rounded-lg w-full max-w-2xl">
+                <div className="text-gray-700 font-bold pb-3 text-3xl text-center">Adicionar Sócio</div>
+
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
 
@@ -141,7 +145,7 @@ export default function PartnerForm() {
 
                         <div className="flex justify-center">
                             <Button type="submit" variant="outline">
-                                Criar Sócio
+                                Criar
                             </Button>
                         </div>
                     </form>

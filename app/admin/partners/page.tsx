@@ -62,8 +62,12 @@ export default function PartnersPage() {
   return (
     <main className="bg-gray-50 min-h-screen p-6 rounded">
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
+
         <div className="p-4 border-b border-gray-200 rounded">
+
           <div className="mb-4">
+            <div className="justify-start text-start text-gray-700 font-bold pb-3 text-3xl">Sócios</div>
+
             <input
               type="text"
               placeholder="Buscar por nome ou telefone"
@@ -118,7 +122,7 @@ export default function PartnersPage() {
             Anterior
           </Button>
           <Button variant="outline">
-            <Link href={"/admin/partners/addPartner"}>Adicionar Sócio
+            <Link href={"/admin/partners/addPartner"}>Adicionar
             </Link></Button>
           <Button
             onClick={handleNextPage}
