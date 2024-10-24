@@ -77,8 +77,8 @@ export default function FamiliarForm({ clientId }: IFamiliarForm) {
                             name="cpf"
                             render={({ field }) => (
                                 <FormItem className="flex flex-col">
-                                    <FormLabel className="text-gray-800 mb-2">CPF</FormLabel>
-                                    <FormControl>
+                                    <FormLabel className=" text-gray-800 mb-2">CPF</FormLabel>
+                                    <FormControl className="border-gray-300">
                                         <InputMask
                                             mask="999.999.999-99"
                                             placeholder="CPF"

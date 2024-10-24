@@ -67,6 +67,8 @@ export default function AddClientForm({ partners }: IClientForm) {
     return (
         <main className="bg-gray-50 min-h-screen p-6 flex justify-center items-center">
             <div className="bg-white p-8 shadow-md rounded-lg w-full max-w-2xl">
+                <div className="text-gray-700 font-bold pb-3 text-3xl text-center">Adicionar Cliente</div>
+
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                         <FormField
@@ -92,13 +94,15 @@ export default function AddClientForm({ partners }: IClientForm) {
                                 control={form.control}
                                 name="cpf"
                                 render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-gray-800">CPF</FormLabel>
+                                    <FormItem className="flex flex-col">
+                                        <FormLabel className="text-gray-800 mb-2">CPF</FormLabel>
                                         <FormControl>
-                                            <Input
+                                            <InputMask
+                                                mask="999.999.999-99"
                                                 placeholder="CPF"
-                                                className="border-gray-300 bg-gray-100 text-gray-800"
-                                                {...field}
+                                                className="border-gray-300 bg-gray-100 text-gray-800 w-full p-2 rounded-md" // Adicione as mesmas classes aqui
+                                                value={field.value}
+                                                onChange={(e: ChangeEvent<HTMLInputElement>) => field.onChange(e.target.value)}
                                             />
                                         </FormControl>
                                         <FormMessage />

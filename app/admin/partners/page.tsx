@@ -4,7 +4,16 @@ import { useState, useEffect } from 'react';
 import Link from "next/link";
 import { EditIcon, TrashIcon } from "lucide-react";
 import { Button } from '@/components/ui/button';
-import { getAllPartners, TPartner, deletePartner } from "@/app/_actions/partner"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious
+} from "@/components/ui/pagination";
+import { getAllPartners, TPartner, deletePartner } from "@/app/_actions/partner";
 
 export default function PartnersPage() {
   const [partners, setPartners] = useState<TPartner>([]);
@@ -15,8 +24,7 @@ export default function PartnersPage() {
   useEffect(() => {
     const fetchPartners = async () => {
       try {
-        const response = await getAllPartners()
-
+        const response = await getAllPartners();
         setPartners(response);
       } catch (error) {
         console.error("Failed to fetch partners", error);
@@ -26,51 +34,36 @@ export default function PartnersPage() {
     fetchPartners();
   }, []);
 
-  // Filtrar partners com base no termo de pesquisa
   const filteredPartners = partners.filter(partner =>
     partner.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
     partner.cpf.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Determinar os partners a serem exibidos na página atual
   const indexOfLastPartner = currentPage * partnersPerPage;
   const indexOfFirstPartner = indexOfLastPartner - partnersPerPage;
   const currentPartners = filteredPartners.slice(indexOfFirstPartner, indexOfLastPartner);
 
-  // Calcular o número total de páginas
   const totalPages = Math.ceil(filteredPartners.length / partnersPerPage);
 
-  // Funções de navegação de página
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(prevPage => prevPage + 1);
-    }
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(prevPage => prevPage - 1);
-    }
-  };
-
-  // Resetar a página atual quando o termo de pesquisa mudar
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(1); // Voltar para a primeira página ao pesquisar
+    setCurrentPage(1);
   };
 
   return (
     <main className="bg-gray-50 min-h-screen p-6 rounded">
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
-
         <div className="p-4 border-b border-gray-200 rounded">
-
           <div className="mb-4">
             <div className="justify-start text-start text-gray-700 font-bold pb-3 text-3xl">Sócios</div>
 
             <input
               type="text"
-              placeholder="Buscar por nome ou telefone"
+              placeholder="Buscar por nome ou CPF"
               value={searchTerm}
               onChange={handleSearchChange}
               className="w-full p-2 border rounded bg-slate-100 text-gray-700"
@@ -113,26 +106,63 @@ export default function PartnersPage() {
             </div>
           ))}
         </div>
-        <div className="flex justify-between p-4">
-          <Button
-            onClick={handlePreviousPage}
-            disabled={currentPage === 1}
-            variant="outline"
-          >
-            Anterior
-          </Button>
-          <Button variant="outline">
-            <Link href={"/admin/partners/addPartner"}>Adicionar
-            </Link></Button>
-          <Button
-            onClick={handleNextPage}
-            disabled={currentPage === totalPages}
-            variant="outline"
-          >
-            Próximo
-          </Button>
+        <div className="flex justify-end p-4">
+          <Link href={"/admin/partners/addPartner"}>
+            <Button variant="outline">
+              Adicionar Novo
+            </Button>
+          </Link>
         </div>
-      </div>
-    </main>
+
+        {/* Paginação ShadCN com fundo preto e texto branco */}
+        <Pagination className=" text-white p-2 rounded-lg">
+          <PaginationContent>
+            <PaginationItem>
+              <Link
+                href="#"
+                onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+                className="bg-black text-white hover:text-gray-300"
+              >
+                <PaginationPrevious className="bg-black">
+                  Anterior
+                </PaginationPrevious>
+              </Link>
+            </PaginationItem>
+
+            {Array.from({ length: totalPages }, (_, i) => (
+              <PaginationItem key={i}>
+                <Link
+                  href="#"
+                  onClick={() => handlePageChange(i + 1)}
+                  className={` text-white hover:text-gray-300 ${currentPage === i + 1 ? 'font-bold' : ''}`}
+                >
+                  <PaginationLink className="bg-black">
+                    {i + 1}
+                  </PaginationLink>
+                </Link>
+              </PaginationItem>
+            ))}
+
+            {totalPages > 5 && (
+              <PaginationItem>
+                <PaginationEllipsis className="text-white" />
+              </PaginationItem>
+            )}
+
+            <PaginationItem>
+              <Link
+                href="#"
+                onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
+                className="text-white hover:text-gray-300"
+              >
+                <PaginationNext className="bg-black">
+                  Próximo
+                </PaginationNext>
+              </Link>
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      </div >
+    </main >
   );
 }

@@ -7,7 +7,10 @@ export const FamiliarSchema = z.object({
     // .length(11, { message: "CPF inválido" })
     , // O CPF deve ter exatamente 11 caracteres
     est_civil: z.enum(["Solteiro", "Casado", "Divorciado", "Viúvo"], { message: "Estado civil é obrigatório" }), // Estado civil é obrigatório e deve estar dentro das opções fornecidas
-    nome: z.string().min(1, { message: "Nome é obrigatório" }).max(102, { message: "Nome deve ter no máximo 102 caracteres" }), // Nome é obrigatório e deve ter no máximo 102 caracteres
+    nome: z.string()
+        .min(1, { message: "Nome é obrigatório" })
+        .max(102, { message: "Nome deve ter no máximo 102 caracteres" })
+        .refine(value => /\s/.test(value), { message: "Deve conter nome e sobrenome" }),
     data_nasc: z.date(), // Verifica se a data de nascimento é válida
     vivo: z.boolean(), // A informação se o familiar está vivo ou não é obrigatória
     nome_conj: z.string().optional(), // Nome do cônjuge é opcional e deve ter no máximo 102 caracteres

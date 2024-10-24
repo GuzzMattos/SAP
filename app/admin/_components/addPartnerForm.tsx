@@ -15,6 +15,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { createPartner } from "@/app/_actions/partner"
+import { ChangeEvent, useState } from "react";
+import InputMask from 'react-input-mask';
+
 
 export default function PartnerForm() {
     const form = useForm<z.infer<typeof PartnerSchema>>({
@@ -89,19 +92,22 @@ export default function PartnerForm() {
                             control={form.control}
                             name="cpf"
                             render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-gray-800">CPF</FormLabel>
+                                <FormItem className="flex flex-col">
+                                    <FormLabel className="text-gray-800 mb-2">CPF</FormLabel>
                                     <FormControl>
-                                        <Input
+                                        <InputMask
+                                            mask="999.999.999-99"
                                             placeholder="CPF"
-                                            className="border-gray-300 bg-gray-100 text-gray-800"
-                                            {...field}
+                                            className="border-gray-300 bg-gray-100 text-gray-800 w-full p-2 rounded-md" // Adicione as mesmas classes aqui
+                                            value={field.value}
+                                            onChange={(e: ChangeEvent<HTMLInputElement>) => field.onChange(e.target.value)}
                                         />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
+
 
                         <FormField
                             control={form.control}
@@ -134,6 +140,24 @@ export default function PartnerForm() {
                                         <Input
                                             type="password"
                                             placeholder="Senha"
+                                            className="border-gray-300 bg-gray-100 text-gray-800"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="confirmarSenha"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="text-gray-800">Confirmar Senha</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="password"
+                                            placeholder="Confirmar Senha"
                                             className="border-gray-300 bg-gray-100 text-gray-800"
                                             {...field}
                                         />
