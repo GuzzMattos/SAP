@@ -1,9 +1,8 @@
 "use server";
 
-import { IndicesSchema } from "@/lib/schemas/indice"; // O caminho do schema que você criou
+import { IndicesSchema } from "@/lib/schemas/indice";
 import { z } from "zod";
 import prisma from "@/lib/db";
-import { redirect } from "next/navigation";
 
 export async function createIndice(values: z.infer<typeof IndicesSchema>) {
     console.log("Creating indice with data:", values);
@@ -27,12 +26,5 @@ export async function createIndice(values: z.infer<typeof IndicesSchema>) {
 
     console.log({ newIndice });
 
-    redirect(`/admin/indices?success=true`);
 }
 
-export async function getAllIndices() {
-    const allIndices = await prisma.indices.findMany({});
-    return allIndices;
-}
-
-export type TIndices = Awaited<ReturnType<typeof getAllIndices>>;
