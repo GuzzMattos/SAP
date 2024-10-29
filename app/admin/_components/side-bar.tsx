@@ -1,4 +1,4 @@
-import { GetUserRole, LogoutAction } from '@/app/_actions/user'
+import { GetUserRole, LogoutAction, GetUserName } from '@/app/_actions/user'
 import { Button } from '@/components/ui/button'
 import { getLinksByRole, UserRole } from '@/lib/links'
 import Image from 'next/image'
@@ -6,6 +6,7 @@ import Link from 'next/link'
 
 const SideBar = async () => {
   const role = await GetUserRole()
+  const userName = await GetUserName()
 
   const adminLinks = getLinksByRole(role as unknown as UserRole)
 
@@ -24,11 +25,14 @@ const SideBar = async () => {
         ))}
       </div>
 
-      <form action={LogoutAction}>
-        <Button type="submit">
-          Sair
-        </Button>
-      </form>
+      <div className="flex flex-col items-start gap-2">
+        <p>{userName}</p>
+        <form action={LogoutAction}>
+          <Button type="submit">
+            Sair
+          </Button>
+        </form>
+      </div>
     </aside>
   )
 }

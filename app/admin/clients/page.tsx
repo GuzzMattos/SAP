@@ -14,6 +14,7 @@ import {
   PaginationPrevious
 } from "@/components/ui/pagination";
 import { getAllClients, TClient } from '@/app/_actions/client';
+import HelperDialog from '@/components/helper-dialog';
 
 export default function ClientsPage() {
   const [clients, setClients] = useState<TClient>([]);
@@ -65,13 +66,24 @@ export default function ClientsPage() {
     setCurrentPage(1);
   };
 
-
   return (
     <main className="bg-gray-50 min-h-screen p-6 rounded">
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <div className="p-4 border-b border-gray-200 rounded">
           <div className="mb-4">
-            <div className="justify-start text-start text-gray-700 font-bold pb-3 text-3xl">Clientes</div>
+            <div className='w-full flex items-center justify-between'>
+              <h1 className="justify-start text-start text-gray-700 font-bold pb-3 text-3xl">Clientes</h1>
+
+              <HelperDialog title='Clientesss'>
+                <div>
+                  daskjdaksldjaksl
+
+                  <span>k
+                    dasdajklsdkaljdkasl
+                  </span>
+                </div>
+              </HelperDialog>
+            </div>
 
             <input
               type="text"

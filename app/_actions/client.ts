@@ -4,6 +4,8 @@ import { ClientSchema } from "@/lib/schemas/client";
 import { z } from "zod";
 import prisma from "@/lib/db";
 import { redirect } from "next/navigation";
+import { GetUserId, GetUserRole } from "./user";
+import { Prisma } from "@prisma/client";
 
 export async function createClient(values: z.infer<typeof ClientSchema>) {
     console.log("Creating client with data:", values);
@@ -43,7 +45,22 @@ export async function createClient(values: z.infer<typeof ClientSchema>) {
 }
 
 export async function getAllClients() {
-    const getAllClients = await prisma.cliente.findMany({})
+    const role = await GetUserRole()
+    const userId = await GetUserId()
+
+    let whereCondition: Prisma.ClienteWhereInput = {}
+
+    if (role !== "admin") {
+        whereCondition = {
+            id_user: {
+                equals: userId
+            }
+        }
+    }
+
+    const getAllClients = await prisma.cliente.findMany({
+        where: whereCondition
+    })
 
     return getAllClients;
 }

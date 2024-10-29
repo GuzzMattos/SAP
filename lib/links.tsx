@@ -2,7 +2,7 @@ import { ChartLine, Handshake, Users } from "lucide-react";
 
 // https://lucide.dev/icons/
 
-export type UserRole = 'admin' | 'user' | 'editor';
+export type UserRole = 'admin' | 'user'
 
 type TLink = {
   title: string;
@@ -28,7 +28,7 @@ const adminLinks: TLink[] = [
     title: 'Sócios',
     url: '/admin/partners',
     icon: <Handshake />,
-    allowedRoles: ['admin', 'editor']
+    allowedRoles: ['admin']
   }
 ];
 

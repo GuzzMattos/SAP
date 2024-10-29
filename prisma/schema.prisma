@@ -56,30 +56,32 @@ model Familiar {
 }
 
 model Investimento {
-  id_invest      String   @id @unique @default(uuid()) @db.Char(36)
-  id_cliente     String   @db.Char(36)
-  cliente        Cliente  @relation(fields: [id_cliente], references: [id_cliente])
-  banco          String   @db.VarChar(40)
-  agencia        String   @db.VarChar(15)
-  conta          String   @db.VarChar(17)
-  classe         String   @db.VarChar(50)
-  sub_classe_atv String   @db.VarChar(30)
-  setor_ativ     String   @db.VarChar(50)
-  liquidez       String   @db.VarChar(20)
-  data_aplic     DateTime
-  data_venc      DateTime
-  indice         String   @db.VarChar(20)
-  porc_indice    Float
-  pre_fixado     Float
-  isento         Boolean
-  pais           String   @db.VarChar(30)
-  valor          Float
+  id_invest        String   @id @unique @default(uuid()) @db.Char(36)
+  id_cliente       String   @db.Char(36)
+  cliente          Cliente  @relation(fields: [id_cliente], references: [id_cliente])
+  banco            String   @db.VarChar(40)
+  agencia          String   @db.VarChar(15)
+  conta            String   @db.VarChar(17)
+  classe           String   @db.VarChar(50)
+  sub_classe_atv   String   @db.VarChar(30)
+  setor_ativ       String   @db.VarChar(50)
+  liquidez         String   @db.VarChar(20)
+  data_aplic       DateTime
+  data_venc        DateTime
+  porc_indice      Float
+  pre_fixado       Float
+  isento           Boolean
+  pais             String   @db.VarChar(30)
+  valor            Float
+  indice           Indices? @relation(fields: [indicesId_indice], references: [id_indice])
+  indicesId_indice String?
 }
 
 model Indices {
-  id_indice String @id @unique @default(uuid())
-  nome      String @unique @db.VarChar(30)
-  valor     Float
+  id_indice     String         @id @unique @default(uuid())
+  nome          String         @unique @db.VarChar(30)
+  valor         Float
+  investimentos Investimento[]
 }
 
 model ConsolidadoInvestimento {

@@ -121,8 +121,8 @@ export default function PartnerForm() {
                                             value={field.value}
                                             onChange={field.onChange}
                                         >
-                                            <option value="Administrador">Administrador</option>
-                                            <option value="Comum">Comum</option>
+                                            <option value="admin">Administrador</option>
+                                            <option value="user">Comum</option>
                                         </select>
                                     </FormControl>
                                     <FormMessage />
