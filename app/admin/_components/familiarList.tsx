@@ -5,7 +5,7 @@ import Link from "next/link";
 import { EditIcon, TrashIcon } from "lucide-react";
 import { Button } from '@/components/ui/button';
 import { getFamiliarsByClientId, TFamiliarsByClientId } from "@/app/_actions/familiar"; // Ajuste o caminho conforme necessário
-
+import { getClientById } from '@/app/_actions/client';
 
 interface IFamiliarPage {
     clientId: string;
@@ -15,9 +15,21 @@ export default function FamiliaresPage({ clientId }: IFamiliarPage) {
     const [familiares, setFamiliares] = useState<TFamiliarsByClientId>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [client, setClient] = useState<any>(null); // Ajuste o tipo conforme o formato dos dados
+
     const familiaresPerPage = 10;
 
-    // UIUIUIUIUIUIUIUIUIUIUIUIUIUIUIUIUIUIUI
+    useEffect(() => {
+        const fetchClient = async () => {
+            try {
+                const data = await getClientById(clientId);
+                setClient(data);
+            } catch (error) {
+                console.error("Failed to fetch client", error);
+            }
+        };
+        fetchClient();
+    }, [clientId]);
 
     useEffect(() => {
         const fetchFamiliares = async () => {

@@ -13,7 +13,7 @@ export const PartnerSchema = z.object({
         .min(1, { message: "Nome é obrigatório" })
         .max(102, { message: "Nome deve ter no máximo 102 caracteres" })
         .refine(value => /\s/.test(value), { message: "Deve conter nome e sobrenome" }),
-    tipo: z.enum(["Administrador", "Comum"], { message: "Tipo de usuário é obrigatório" })
+    tipo: z.enum(["admin", "user"], { message: "Tipo de usuário é obrigatório" })
         .refine(value => value.length <= 15, { message: "Tipo deve ter no máximo 15 caracteres" }),
     email: z.string()
         .email({ message: "Email inválido" })

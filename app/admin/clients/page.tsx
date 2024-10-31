@@ -79,8 +79,7 @@ export default function ClientsPage() {
                   daskjdaksldjaksl
 
                   <span>k
-                    dasdajklsdkaljdkasl
-                  </span>
+                    COLMANZERA                  </span>
                 </div>
               </HelperDialog>
             </div>

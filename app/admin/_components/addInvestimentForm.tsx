@@ -15,17 +15,15 @@ import { useEffect } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { countries } from "@/lib/countries";
 import { bancos } from "@/lib/bancos";
-
-
-
-
+import { TIndice } from "@/app/_actions/indice";
 
 
 interface IInvestimentForm {
     clientId: string;
+    indice: TIndice;
 }
 
-export default function InvestimentForm({ clientId }: IInvestimentForm) {
+export default function InvestimentForm({ clientId, indice }: IInvestimentForm) {
     const form = useForm<TInvestimentSchema>({
         resolver: zodResolver(InvestimentSchema),
         defaultValues: {
@@ -39,7 +37,7 @@ export default function InvestimentForm({ clientId }: IInvestimentForm) {
             liquidez: "",
             data_aplic: new Date(),
             data_venc: new Date(),
-            indice: "",
+            id_indice: '',
             porc_indice: 0,
             pre_fixado: 0,
             isento: false,
@@ -285,7 +283,7 @@ export default function InvestimentForm({ clientId }: IInvestimentForm) {
 
                                 return (
                                     <FormItem>
-                                        <FormLabel className="text-gray-800">Data da Aplicação</FormLabel>
+                                        <FormLabel className="text-gray-800">Data do Vencimento</FormLabel>
                                         <FormControl>
                                             <InputMask
                                                 mask="99/99/9999"
@@ -310,19 +308,32 @@ export default function InvestimentForm({ clientId }: IInvestimentForm) {
                             }}
                         />
 
-
                         <FormField
                             control={form.control}
-                            name="indice"
+                            name="id_indice" // Alterado para id_indice
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel className="text-gray-800">Índice</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            placeholder="Índice"
-                                            className="border-gray-300 bg-gray-100 text-gray-800"
-                                            {...field}
-                                        />
+                                        <select
+                                            className="bg-gray-100 text-gray-800 text-sm border border-gray-300 rounded-md p-2 w-full mt-1"
+                                            value={field.value || ""} // Acesse diretamente field.value
+                                            onChange={(e) => {
+                                                const selectedId = e.target.value;
+                                                field.onChange(selectedId); // Atualiza diretamente com o id_indice
+                                            }}
+                                        >
+                                            <option value="">Selecione um índice</option>
+                                            {indice && indice.length > 0 ? (
+                                                indice.map((p) => (
+                                                    <option key={p.id_indice} value={p.id_indice}>
+                                                        {p.nome}
+                                                    </option>
+                                                ))
+                                            ) : (
+                                                <option value="">Nenhum índice disponível</option>
+                                            )}
+                                        </select>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

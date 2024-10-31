@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Select, SelectItem, SelectTrigger, SelectContent, SelectValue } from "@/components/ui/select";
 import { getAllClients, TClient } from "@/app/_actions/client";
 import { getInvestimentsByClientId, TInvestimentsByClientId } from "@/app/_actions/investiment";
+import { getAllIndices } from "@/app/_actions/indice";
 import { Pie, PieChart } from "recharts";
 import {
   Card,
@@ -18,6 +19,7 @@ import {
   ChartLegend,
   ChartLegendContent,
 } from "@/components/ui/chart";
+import { getIndiceValorById } from "@/app/_actions/indice";
 
 export default function DashboardPage() {
   const [clientes, setClientes] = useState<TClient>([]);
@@ -25,7 +27,10 @@ export default function DashboardPage() {
   const [investimentos, setInvestimentos] = useState<TInvestimentsByClientId>([]);
   const [totalInvestimentos, setTotalInvestimentos] = useState<number>(0);
   const [numInvestimentos, setNumInvestimentos] = useState<number>(0);
+  const [rentBruta, setRentBruta] = useState<number>(0);
+
   const [totalCDB, setTotalCDB] = useState<number>(0);
+  const [cdiValue, setCdiValue] = useState<number | null>(null);
   const [chartData1, setChartData1] = useState([
     { tipoativo: "cdb", quant: 900, fill: "red" },
     { tipoativo: "lc", quant: 275, fill: "green" },
@@ -95,6 +100,16 @@ export default function DashboardPage() {
       color: "purple",
     },
   } satisfies ChartConfig;
+  useEffect(() => {
+    // Busca todos os índices e localiza o CDI
+    async function fetchCdiIndex() {
+      const indices = await getAllIndices();
+      const cdiIndex = indices.find((indice) => indice.nome === 'CDI');
+      setCdiValue(cdiIndex ? cdiIndex.valor : null);
+    }
+
+    fetchCdiIndex();
+  }, []);
 
   useEffect(() => {
     async function fetchClientes() {
@@ -119,6 +134,30 @@ export default function DashboardPage() {
           setTotalInvestimentos(total);
           setNumInvestimentos(investments.length);
 
+          // Obter o valor do índice para cada investimento que tenha id_indice
+          const indicesValores = await Promise.all(
+            investments.map(async (investimento) => {
+              if (investimento.id_indice) {
+                return await getIndiceValorById(investimento.id_indice);
+              }
+              return 0; // Retorna 0 caso o id_indice seja nulo
+            })
+          );
+
+          // Calcula o valor ponderado para cada investimento com base nos índices e na taxa pré-fixada
+          const rentBruta = investments.reduce((acc, investimento, index) => {
+            // Ajuste do índice e pre-fixado como porcentagens
+            const valorIndiceAjustado = indicesValores[index] * (investimento.porc_indice / 100);
+            const valorPreFixado = ((((((investimento.pre_fixado / 100) + 1) ** (1 / 12)) - 1)));
+
+            // Calcula a rentabilidade ponderada do investimento
+            const rentabilidade = investimento.valor * (valorIndiceAjustado + valorPreFixado);
+
+            // Soma as rentabilidades ponderadas
+            return acc + rentabilidade;
+          }, 0) / investments.reduce((acc, investimento) => acc + investimento.valor, 0);
+          // Ajuste final para anualizar a rentabilidade bruta
+          setRentBruta(parseFloat(((((rentBruta) + 1) ** 12 - 1) * 100).toFixed(2)));
           // Calcular o total de CDB
           const totalCDB = investments
             .filter(investimento => investimento.sub_classe_atv === "cdb")
@@ -198,17 +237,22 @@ export default function DashboardPage() {
           <div className="flex justify-between mb-4">
             <div>
               <p className="text-gray-500">Rentabilidade Bruta</p>
-              <p className="text-red-500 text-5xl font-bold">12%</p>
+              <p className="text-red-500 text-5xl font-bold">  {rentBruta ? `${rentBruta}%` : '0%'}</p>
             </div>
             <div>
               <p className="text-gray-500">Rentabilidade Objetivo</p>
-              <p className="text-blue-500 text-5xl font-bold">15%</p>
+              <p className="text-blue-500 text-5xl font-bold">{cdiValue !== null ? `${(((((cdiValue) + 1) ** 12) - 1) * 100).toFixed(2)}%` : 'Carregando...'}</p>
             </div>
           </div>
 
           <div className="mt-4 pt-8">
             <p className="text-gray-500">Rentabilidade Relativa</p>
-            <p className="text-red-500 text-5xl font-bold">-2%</p>
+            <p className="text-red-500 text-5xl font-bold">{cdiValue && rentBruta
+              ? `${(
+                (Number(rentBruta) - ((((Number(cdiValue)) + 1) ** 12 - 1) * 100)) /
+                ((((Number(cdiValue)) + 1) ** 252 - 1) * 100)
+              ).toFixed(2)}%`
+              : '0%'}</p>
           </div>
         </div>
       </div>

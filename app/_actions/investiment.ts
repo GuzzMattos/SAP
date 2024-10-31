@@ -7,7 +7,6 @@ import { redirect } from "next/navigation";
 
 // Função para criar um novo Investiment
 export async function createInvestiment(clientId: string, values: z.infer<typeof InvestimentSchema>) {
-    // Verifica se já existe um investiment com o mesmo banco, agência e conta (ou outras verificações de unicidade, se necessário)
     const investimentExists = await prisma.investimento.findFirst({
         where: {
             conta: values.conta,
@@ -28,20 +27,22 @@ export async function createInvestiment(clientId: string, values: z.infer<typeof
             sub_classe_atv: values.sub_classe_atv,
             setor_ativ: values.setor_ativ,
             liquidez: values.liquidez,
-            data_aplic: new Date(values.data_aplic), // Convertendo string para Date
-            data_venc: new Date(values.data_venc), // Convertendo string para Date
-            indice: values.indice,
+            data_aplic: new Date(values.data_aplic),
+            data_venc: new Date(values.data_venc),
             porc_indice: values.porc_indice,
             pre_fixado: values.pre_fixado,
             isento: values.isento,
             pais: values.pais,
             valor: values.valor,
+            id_indice: values.id_indice ?? null // Corrigido para passar apenas a string `id_indice`
         }
     });
 
     console.log({ newInvestiment });
-    redirect(`/admin/clients/${clientId}?success=true`)
+    redirect(`/admin/clients/${clientId}?success=true`);
 }
+
+
 
 // Função para obter todos os Investiments
 export async function getAllInvestiments() {

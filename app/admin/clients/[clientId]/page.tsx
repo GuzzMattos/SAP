@@ -32,9 +32,12 @@ export default function SingleClientPage({ params }: { params: { clientId: strin
 
   return (
     <main className="bg-gray-50 min-h-screen p-6">
+      <span className="text-black font-bold pb-3 text-3xl">{client.nome}</span>
       <Card className="p-6 max-w-full mx-auto bg-white shadow-md rounded-lg">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
+
           <TabsList className="border-b border-gray-300 mb-4">
+
             <TabsTrigger value="Cliente" className="py-2 px-4 text-gray-400 hover:text-blue-500 focus:outline-none focus:ring-0">
               Cliente
             </TabsTrigger>

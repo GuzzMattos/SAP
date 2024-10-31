@@ -1,10 +1,11 @@
 import InvestimentForm from "@/app/admin/_components/addInvestimentForm";
+import { getAllIndices } from "@/app/_actions/indice";
 
-export default function AddInvestimentPage({ params }: { params: { clientId: string } }) {
-
+export default async function AddInvestimentPage({ params }: { params: { clientId: string } }) {
+    const indices = await getAllIndices();
     return (
         <main>
-            <InvestimentForm clientId={params.clientId} />
+            <InvestimentForm indice={indices} clientId={params.clientId} />
         </main>
     );
 }

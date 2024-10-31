@@ -26,7 +26,7 @@ export default function PartnerForm() {
             nome: "",
             email: "",
             cpf: "",
-            tipo: "Comum",
+            tipo: "user",
             senha: "",
         },
     });
@@ -120,7 +120,11 @@ export default function PartnerForm() {
                                             className="bg-gray-100 text-gray-800 text-sm border border-gray-300 rounded-md p-2 w-full mt-1"
                                             value={field.value}
                                             onChange={field.onChange}
+                                            defaultValue=""
                                         >
+                                            <option value="" disabled>
+                                                Selecione o tipo do usuário
+                                            </option>
                                             <option value="admin">Administrador</option>
                                             <option value="user">Comum</option>
                                         </select>
@@ -129,6 +133,7 @@ export default function PartnerForm() {
                                 </FormItem>
                             )}
                         />
+
 
                         <FormField
                             control={form.control}
