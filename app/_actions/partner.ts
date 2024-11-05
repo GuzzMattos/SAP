@@ -58,50 +58,61 @@ export async function getPartnerById(partnerId: string) {
 export type TPartnerById = Awaited<ReturnType<typeof getPartnerById>>;
 
 
-export async function updatePartner(values: z.infer<typeof PartnerSchema>) {
-
-    // ACHA O USUARIO
+export async function updatePartner(id: string, values: z.infer<typeof PartnerSchema>) {
+    // ACHA O USUÁRIO PELO ID
     const user = await prisma.usuario.findUnique({
         where: {
-            cpf: values.cpf
+            id_user: id
         }
-    })
+    });
 
     // VERIFICA SE EXISTE
     if (!user) {
         throw new Error("Usuário não encontrado");
     }
 
-    // SE EXISTE ATUALIZA
+    // SE EXISTE, ATUALIZA
     const updatedPartner = await prisma.usuario.update({
         where: {
-            id_user: user.id_user,
+            id_user: id
         },
         data: {
+            nome: values.nome,
             cpf: values.cpf,
             email: values.email,
-            nome: values.nome,
             senha: values.senha,
             tipo: values.tipo
         }
-    })
+    });
 
-    console.log({ updatedPartner })
+    console.log({ updatedPartner });
+
+    return updatedPartner;
 }
-
 export async function deletePartner(partnerId: string) {
+    // Verifica se o usuário (partner) existe
     const user = await prisma.usuario.findUnique({
         where: {
             id_user: partnerId
         }
-    })
+    });
 
-    // VERIFICA SE EXISTE
     if (!user) {
         throw new Error("Usuário não encontrado");
     }
 
-    // SE EXISTE EXCLUI
+    // Verifica se o partner possui clientes associados
+    const associatedClients = await prisma.cliente.findFirst({
+        where: {
+            id_user: partnerId
+        }
+    });
+
+    if (associatedClients) {
+        throw new Error("Não é possível deletar o sócio, pois ele possui clientes vinculados.");
+    }
+
+    // Se não houver clientes associados, exclui o partner
     await prisma.usuario.delete({
         where: {
             id_user: partnerId

@@ -16,6 +16,9 @@ import "react-datepicker/dist/react-datepicker.css";
 import { countries } from "@/lib/countries";
 import { bancos } from "@/lib/bancos";
 import { TIndice } from "@/app/_actions/indice";
+import CurrencyInput, { CurrencyInputProps, CurrencyInputOnChangeValues } from 'react-currency-input-field';
+import jQuery from "jquery";
+
 
 
 interface IInvestimentForm {
@@ -45,6 +48,8 @@ export default function InvestimentForm({ clientId, indice }: IInvestimentForm) 
             valor: 0,
         },
     });
+
+
 
     async function onSubmit(values: TInvestimentSchema) {
         console.log("onSubmit called");
@@ -106,10 +111,12 @@ export default function InvestimentForm({ clientId, indice }: IInvestimentForm) 
                                 <FormItem>
                                     <FormLabel className="text-gray-800">Agência</FormLabel>
                                     <FormControl>
-                                        <Input
+                                        <InputMask
+                                            mask="9999-9" // Máscara para a agência
                                             placeholder="Agência"
-                                            className="border-gray-300 bg-gray-100 text-gray-800"
-                                            {...field}
+                                            className="border-gray-300 bg-gray-100 text-gray-800 w-full p-2 rounded-md"
+                                            value={field.value}
+                                            onChange={field.onChange}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -124,10 +131,12 @@ export default function InvestimentForm({ clientId, indice }: IInvestimentForm) 
                                 <FormItem>
                                     <FormLabel className="text-gray-800">Conta</FormLabel>
                                     <FormControl>
-                                        <Input
+                                        <InputMask
+                                            mask="99999-9" // Máscara para a conta
                                             placeholder="Conta"
-                                            className="border-gray-300 bg-gray-100 text-gray-800"
-                                            {...field}
+                                            className="border-gray-300 bg-gray-100 text-gray-800 w-full p-2 rounded-md"
+                                            value={field.value}
+                                            onChange={field.onChange}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -339,47 +348,55 @@ export default function InvestimentForm({ clientId, indice }: IInvestimentForm) 
                                 </FormItem>
                             )}
                         />
+                        <div className="flex space-x-4"> {/* Flex container com espaço entre os inputs */}
+                            <FormField
+                                control={form.control}
+                                name="porc_indice"
+                                render={({ field }) => (
+                                    <FormItem className="w-1/6"> {/* Ajuste a largura do FormItem */}
+                                        <FormLabel className="text-gray-800">Porcentagem do Índice</FormLabel>
+                                        <FormControl>
+                                            <div className="flex items-center">
+                                                <Input
+                                                    type="currency"
+                                                    step="0.01"
+                                                    placeholder="Porcentagem do Índice"
+                                                    className="border-gray-300 bg-gray-100 text-gray-800 w-full" // w-full para preencher o espaço
+                                                    value={field.value !== undefined ? String(field.value) : ""}
+                                                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                                />
+                                                <span className="ml-2 text-gray-800">%</span>
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
-                        <FormField
-                            control={form.control}
-                            name="porc_indice"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-gray-800">Porcentagem do Índice</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="number"
-                                            step="0.01"
-                                            placeholder="Porcentagem do Índice"
-                                            className="border-gray-300 bg-gray-100 text-gray-800"
-                                            value={field.value !== undefined ? String(field.value) : ""}
-                                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="pre_fixado"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-gray-800">Pré-Fixado</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="number"
-                                            step="0.01"
-                                            placeholder="Pré-Fixado"
-                                            className="border-gray-300 bg-gray-100 text-gray-800"
-                                            value={field.value !== undefined ? String(field.value) : ""}
-                                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                            <FormField
+                                control={form.control}
+                                name="pre_fixado"
+                                render={({ field }) => (
+                                    <FormItem className="w-1/6"> {/* Ajuste a largura do FormItem */}
+                                        <FormLabel className="text-gray-800">Pré-Fixado</FormLabel>
+                                        <FormControl>
+                                            <div className="flex items-center">
+                                                <Input
+                                                    type="number"
+                                                    step="0.01"
+                                                    placeholder="Pré-Fixado"
+                                                    className="border-gray-300 bg-gray-100 text-gray-800 w-full" // w-full para preencher o espaço
+                                                    value={field.value !== undefined ? String(field.value) : ""}
+                                                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                                />
+                                                <span className="ml-2 text-gray-800">%</span>
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
 
                         <FormField
                             control={form.control}
@@ -455,6 +472,7 @@ export default function InvestimentForm({ clientId, indice }: IInvestimentForm) 
                                 </FormItem>
                             )}
                         />
+
 
                         <div className="flex justify-center">
                             <Button type="submit" variant="outline">

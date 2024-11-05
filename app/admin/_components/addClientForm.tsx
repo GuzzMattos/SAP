@@ -42,7 +42,7 @@ export default function AddClientForm({ partners }: IClientForm) {
             taxResidenceInBrazil: false,
             email: "",
             profession: "",
-            partnerId: uuidv4(),
+            partnerId: "",
         },
     });
 
@@ -193,7 +193,7 @@ export default function AddClientForm({ partners }: IClientForm) {
                                                     value={field.value}
                                                     onChange={field.onChange}
                                                 >
-                                                    <option value="">Selecione um regime de bens</option>
+                                                    <option value="" disabled>Selecione um regime de bens</option>
                                                     <option value="Separação total de bens">Separação total de bens</option>
                                                     <option value="Comunhão parcial de bens">Comunhão parcial de bens</option>
                                                     <option value="Comunhão universal de bens">Comunhão universal de bens</option>
@@ -296,11 +296,16 @@ export default function AddClientForm({ partners }: IClientForm) {
                                     <FormControl>
                                         <select
                                             className="bg-gray-100 text-gray-800 text-sm border border-gray-300 rounded-md p-2 w-full mt-1"
-                                            value={field.value}
+                                            value={field.value || ""} // Garante que a opção padrão seja selecionada inicialmente
                                             onChange={field.onChange}
                                         >
+                                            <option value="" disabled>
+                                                Selecione um sócio
+                                            </option>
                                             {partners.map((p) => (
-                                                <option value={p.id_user}>{p.nome}</option>
+                                                <option key={p.id_user} value={p.id_user}>
+                                                    {p.nome}
+                                                </option>
                                             ))}
                                         </select>
                                     </FormControl>

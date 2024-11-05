@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from "next/link";
-import { EditIcon, TrashIcon } from "lucide-react";
+import { EditIcon, Key, TrashIcon } from "lucide-react";
 import { Button } from '@/components/ui/button';
 import {
   Pagination,
@@ -14,11 +14,15 @@ import {
   PaginationPrevious
 } from "@/components/ui/pagination";
 import { getAllPartners, TPartner, deletePartner } from "@/app/_actions/partner";
+import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
 export default function PartnersPage() {
   const [partners, setPartners] = useState<TPartner>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedPartnerId, setSelectedPartnerId] = useState<string | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const partnersPerPage = 10;
 
   useEffect(() => {
@@ -38,10 +42,10 @@ export default function PartnersPage() {
     partner.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
     partner.cpf.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
+  const sortedPartners = filteredPartners.sort((a, b) => a.nome.localeCompare(b.nome));
   const indexOfLastPartner = currentPage * partnersPerPage;
   const indexOfFirstPartner = indexOfLastPartner - partnersPerPage;
-  const currentPartners = filteredPartners.slice(indexOfFirstPartner, indexOfLastPartner);
+  const currentPartners = sortedPartners.slice(indexOfFirstPartner, indexOfLastPartner);
 
   const totalPages = Math.ceil(filteredPartners.length / partnersPerPage);
 
@@ -49,11 +53,23 @@ export default function PartnersPage() {
     setCurrentPage(page);
   };
 
+  const confirmDeletePartner = async () => {
+    if (selectedPartnerId) {
+      try {
+        await deletePartner(selectedPartnerId);
+        setPartners(partners.filter(partner => partner.id_user !== selectedPartnerId));
+        setSelectedPartnerId(null);
+      } catch (error: any) {
+        setError(error.message);  // Captura a mensagem de erro para exibição
+      }
+    }
+  };
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
     setCurrentPage(1);
   };
-
+  //aaaaa
   return (
     <main className="bg-gray-50 min-h-screen p-6 rounded">
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
@@ -92,16 +108,42 @@ export default function PartnersPage() {
                 <button
                   aria-label="Edit"
                   className="p-1 rounded hover:bg-gray-200"
+
                 >
-                  <EditIcon className="w-5 h-5 text-gray-600" />
+                  <Link href={`/admin/partners/${partner.id_user}/editPartner`} className="text-gray-600 hover:underline">
+                    <EditIcon className="w-5 h-5 text-gray-600" />
+                  </Link>
+
                 </button>
-                <button
-                  aria-label="Delete"
-                  className="p-1 rounded hover:bg-gray-200"
-                  onClick={() => deletePartner(partner.id_user)}
-                >
-                  <TrashIcon className="w-5 h-5 text-red-600" />
-                </button>
+                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                  <DialogTrigger asChild>
+                    <button
+                      key={partner.id_user}
+                      aria-label="Delete"
+                      className="p-1 rounded hover:bg-gray-200"
+                      onClick={() => {
+                        setSelectedPartnerId(partner.id_user);
+                        setDialogOpen(true); // Abre o diálogo quando clica em deletar
+                      }}
+                    >
+                      <TrashIcon className="w-5 h-5 text-red-600" />
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogTitle>Confirmar Exclusão</DialogTitle>
+                    <DialogDescription>
+                      Tem certeza de que deseja excluir o sócio {partner.nome}?
+                    </DialogDescription>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setDialogOpen(false)}>
+                        Cancelar
+                      </Button>
+                      <Button variant="destructive" onClick={confirmDeletePartner}>
+                        Confirmar
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
           ))}
@@ -115,31 +157,26 @@ export default function PartnersPage() {
         </div>
 
         {/* Paginação ShadCN com fundo preto e texto branco */}
-        <Pagination className=" text-white p-2 rounded-lg">
+        {/* Paginação ShadCN com fundo preto e texto branco */}
+        <Pagination className="text-white p-2 rounded-lg">
           <PaginationContent>
             <PaginationItem>
-              <Link
-                href="#"
+              <PaginationPrevious
                 onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
                 className="bg-black text-white hover:text-gray-300"
               >
-                <PaginationPrevious className="bg-black">
-                  Anterior
-                </PaginationPrevious>
-              </Link>
+                Anterior
+              </PaginationPrevious>
             </PaginationItem>
 
             {Array.from({ length: totalPages }, (_, i) => (
               <PaginationItem key={i}>
-                <Link
-                  href="#"
+                <PaginationLink
                   onClick={() => handlePageChange(i + 1)}
-                  className={` text-white hover:text-gray-300 ${currentPage === i + 1 ? 'font-bold' : ''}`}
+                  className={`bg-black text-white hover:text-gray-300 ${currentPage === i + 1 ? 'font-bold' : ''}`}
                 >
-                  <PaginationLink className="bg-black">
-                    {i + 1}
-                  </PaginationLink>
-                </Link>
+                  {i + 1}
+                </PaginationLink>
               </PaginationItem>
             ))}
 
@@ -150,19 +187,32 @@ export default function PartnersPage() {
             )}
 
             <PaginationItem>
-              <Link
-                href="#"
+              <PaginationNext
                 onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
-                className="text-white hover:text-gray-300"
+                className="bg-black text-white hover:text-gray-300"
               >
-                <PaginationNext className="bg-black">
-                  Próximo
-                </PaginationNext>
-              </Link>
+                Próximo
+              </PaginationNext>
             </PaginationItem>
           </PaginationContent>
         </Pagination>
-      </div >
-    </main >
+
+      </div>
+
+      {/* Diálogo de erro para exclusão */}
+      {error && (
+        <Dialog open={!!error} onOpenChange={() => setError(null)}>
+          <DialogContent>
+            <DialogTitle>Erro ao Excluir Sócio</DialogTitle>
+            <DialogDescription>{error}</DialogDescription>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setError(null)}>
+                Fechar
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+    </main>
   );
 }

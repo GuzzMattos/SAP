@@ -7,16 +7,6 @@ import { redirect } from "next/navigation";
 
 // Função para criar um novo Investiment
 export async function createInvestiment(clientId: string, values: z.infer<typeof InvestimentSchema>) {
-    const investimentExists = await prisma.investimento.findFirst({
-        where: {
-            conta: values.conta,
-        }
-    });
-
-    if (investimentExists) {
-        throw new Error("Investiment com essa conta já existe.");
-    }
-
     const newInvestiment = await prisma.investimento.create({
         data: {
             id_cliente: clientId,

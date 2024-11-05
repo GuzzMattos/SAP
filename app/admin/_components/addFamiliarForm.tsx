@@ -214,7 +214,7 @@ export default function FamiliarForm({ clientId }: IFamiliarForm) {
                                             value={field.value}
                                             onChange={field.onChange}
                                         >
-                                            <option value="Outro Parentesco">Selecione um parentesco</option>
+                                            <option value="Outro Parentesco" disabled>Selecione um parentesco</option>
                                             <option value="Avô">Avô</option>
                                             <option value="Avó">Avó</option>
                                             <option value="Pai">Pai</option>
