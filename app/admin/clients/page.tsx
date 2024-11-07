@@ -67,121 +67,113 @@ export default function ClientsPage() {
   };
 
   return (
-    <main className="bg-gray-50 min-h-screen p-6 rounded">
-      <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <div className="p-4 border-b border-gray-200 rounded">
-          <div className="mb-4">
-            <div className='w-full flex items-center justify-between'>
-              <h1 className="justify-start text-start text-gray-700 font-bold pb-3 text-3xl">Clientes</h1>
+    <main className="bg-gray-50 min-h-screen p-6 rounded relative">
+    <div className="bg-white shadow-md rounded-lg overflow-hidden">
+        
+        {/* Contêiner do título e HelperDialog */}
+        <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+            <h1 className="text-gray-700 font-bold text-3xl">Clientes</h1>
 
-              <HelperDialog title='Clientesss'>
+            {/* HelperDialog no canto superior direito */}
+            <HelperDialog title="Ajuda">
                 <div>
-                  daskjdaksldjaksl
-
-                  <span>k
-                    COLMANZERA                  </span>
+                    Aqui você pode gerenciar seus clientes. Utilize o campo de busca para filtrar por nome ou CPF.
                 </div>
-              </HelperDialog>
-            </div>
+            </HelperDialog>
+        </div>
 
+        <div className="p-4 border-b border-gray-200">
+            {/* Campo de busca */}
             <input
-              type="text"
-              placeholder="Buscar por nome ou CPF"
-              value={searchTerm}
-              onChange={handleSearchChange}
-              className="w-full p-2 border rounded bg-slate-100 text-gray-700"
+                type="text"
+                placeholder="Buscar por nome ou CPF"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                className="w-full p-2 border rounded bg-slate-100 text-gray-700"
             />
-          </div>
-          <div className="grid grid-cols-3 gap-4 text-gray-700 font-semibold">
-            <div className="justify-start text-start">Nome</div>
-            <div className="text-center">CPF</div>
-            <div className="text-end pr-2.5">Ações</div>
-          </div>
-        </div>
-        <div className="divide-y divide-gray-200">
-          {currentClients.map((client) => (
-            <div key={client.id_cliente} className="grid grid-cols-3 gap-4 items-center px-4 py-1">
-              <div className="flex items-center justify-start text-gray-900">
-                <Link href={`/admin/clients/${client.id_cliente}`} className="text-gray-600 hover:underline">
-                  {client.nome}
-                </Link>
-              </div>
-              <div className="flex items-center justify-center text-gray-600">
-                {client.cpf}
-              </div>
-              <div className="flex items-center justify-end space-x-2">
-                <button
-                  aria-label="Edit"
-                  className="p-1 rounded hover:bg-gray-200"
-                >
-                  <EditIcon className="w-5 h-5 text-gray-600" />
-                </button>
-                <button
-                  aria-label="Delete"
-                  className="p-1 rounded hover:bg-gray-200"
-                >
-                  <TrashIcon className="w-5 h-5 text-red-600" />
-                </button>
-              </div>
+
+            {/* Cabeçalhos da tabela */}
+            <div className="grid grid-cols-3 gap-4 text-gray-700 font-semibold mt-4">
+                <div className="justify-start text-start">Nome</div>
+                <div className="text-center">CPF</div>
+                <div className="text-end pr-2.5">Ações</div>
             </div>
-          ))}
         </div>
-        <div className="flex justify-end p-4">
-          <Link href={"/admin/clients/addClient"}>
-            <Button variant="outline">
-              Adicionar Novo
-            </Button>
-          </Link>
-        </div>
-        {/* Paginação ShadCN com fundo preto e texto branco */}
-        <Pagination className=" text-white p-2 rounded-lg">
-          <PaginationContent>
-            <PaginationItem>
-              <Link
-                href="#"
-                onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
-                className="bg-black text-white hover:text-gray-300"
-              >
-                <PaginationPrevious className="bg-black">
-                  Anterior
-                </PaginationPrevious>
-              </Link>
-            </PaginationItem>
 
-            {Array.from({ length: totalPages }, (_, i) => (
-              <PaginationItem key={i}>
-                <Link
-                  href="#"
-                  onClick={() => handlePageChange(i + 1)}
-                  className={` text-white hover:text-gray-300 ${currentPage === i + 1 ? 'font-bold' : ''}`}
-                >
-                  <PaginationLink className="bg-black">
-                    {i + 1}
-                  </PaginationLink>
-                </Link>
-              </PaginationItem>
+        {/* Lista de clientes */}
+        <div className="divide-y divide-gray-200">
+            {currentClients.map((client) => (
+                <div key={client.id_cliente} className="grid grid-cols-3 gap-4 items-center px-4 py-1">
+                    <div className="flex items-center justify-start text-gray-900">
+                        <Link href={`/admin/clients/${client.id_cliente}`} className="text-gray-600 hover:underline">
+                            {client.nome}
+                        </Link>
+                    </div>
+                    <div className="flex items-center justify-center text-gray-600">
+                        {client.cpf}
+                    </div>
+                    <div className="flex items-center justify-end space-x-2">
+                        <button
+                            aria-label="Edit"
+                            className="p-1 rounded hover:bg-gray-200"
+                        >
+                            <EditIcon className="w-5 h-5 text-gray-600" />
+                        </button>
+                        <button
+                            aria-label="Delete"
+                            className="p-1 rounded hover:bg-gray-200"
+                        >
+                            <TrashIcon className="w-5 h-5 text-red-600" />
+                        </button>
+                    </div>
+                </div>
             ))}
+        </div>
 
-            {totalPages > 5 && (
-              <PaginationItem>
-                <PaginationEllipsis className="text-white" />
-              </PaginationItem>
-            )}
+        {/* Botão Adicionar Novo */}
+        <div className="flex justify-end p-4">
+            <Link href="/admin/clients/addClient">
+                <Button variant="outline">Adicionar Novo</Button>
+            </Link>
+        </div>
 
-            <PaginationItem>
-              <Link
-                href="#"
-                onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
-                className="text-white hover:text-gray-300"
-              >
-                <PaginationNext className="bg-black">
-                  Próximo
-                </PaginationNext>
-              </Link>
-            </PaginationItem>
-          </PaginationContent>
+        {/* Paginação */}
+        <Pagination className="text-white p-2 rounded-lg">
+            <PaginationContent>
+                <PaginationItem>
+                    <Link
+                        href="#"
+                        onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+                        className="bg-black text-white hover:text-gray-300"
+                    >
+                        <PaginationPrevious className="bg-black">Anterior</PaginationPrevious>
+                    </Link>
+                </PaginationItem>
+
+                {Array.from({ length: totalPages }, (_, i) => (
+                    <PaginationItem key={i}>
+                        <Link
+                            href="#"
+                            onClick={() => handlePageChange(i + 1)}
+                            className={`text-white hover:text-gray-300 ${currentPage === i + 1 ? 'font-bold' : ''}`}
+                        >
+                            <PaginationLink className="bg-black">{i + 1}</PaginationLink>
+                        </Link>
+                    </PaginationItem>
+                ))}
+
+                <PaginationItem>
+                    <Link
+                        href="#"
+                        onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
+                        className="text-white hover:text-gray-300"
+                    >
+                        <PaginationNext className="bg-black">Próximo</PaginationNext>
+                    </Link>
+                </PaginationItem>
+            </PaginationContent>
         </Pagination>
-      </div>
-    </main>
-  );
+    </div>
+</main>
+  )
 }
