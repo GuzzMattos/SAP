@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { createPartner } from "@/app/_actions/partner"
 import { ChangeEvent, useState } from "react";
 import InputMask from 'react-input-mask';
+import HelperDialog from "@/components/helper-dialog";
 
 
 export default function PartnerForm() {
@@ -44,142 +45,149 @@ export default function PartnerForm() {
     return (
 
         <main className="bg-gray-50 min-h-screen p-6 flex justify-center items-center">
-
-            <div className="bg-white p-8 shadow-md rounded-lg w-full max-w-2xl">
-                <div className="text-gray-700 font-bold pb-3 text-3xl text-center">Adicionar Sócio</div>
-
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-
-                        <FormField
-                            control={form.control}
-                            name="nome"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-gray-800">Nome</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            placeholder="Nome"
-                                            className="border-gray-300 bg-gray-100 text-gray-800"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={form.control}
-                            name="email"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-gray-800">Email</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="email"
-                                            placeholder="Email"
-                                            className="border-gray-300 bg-gray-100 text-gray-800"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={form.control}
-                            name="cpf"
-                            render={({ field }) => (
-                                <FormItem className="flex flex-col">
-                                    <FormLabel className="text-gray-800 mb-2">CPF</FormLabel>
-                                    <FormControl>
-                                        <InputMask
-                                            mask="999.999.999-99"
-                                            placeholder="CPF"
-                                            className="border-gray-300 bg-gray-100 text-gray-800 w-full p-2 rounded-md" // Adicione as mesmas classes aqui
-                                            value={field.value}
-                                            onChange={(e: ChangeEvent<HTMLInputElement>) => field.onChange(e.target.value)}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-
-                        <FormField
-                            control={form.control}
-                            name="tipo"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-gray-800">Tipo de Usuário</FormLabel>
-                                    <FormControl>
-                                        <select
-                                            className="bg-gray-100 text-gray-800 text-sm border border-gray-300 rounded-md p-2 w-full mt-1"
-                                            value={field.value}
-                                            onChange={field.onChange}
-                                            defaultValue=""
-                                        >
-                                            <option value="" disabled>
-                                                Selecione o tipo do usuário
-                                            </option>
-                                            <option value="admin">Administrador</option>
-                                            <option value="user">Comum</option>
-                                        </select>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-
-                        <FormField
-                            control={form.control}
-                            name="senha"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-gray-800">Senha</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="password"
-                                            placeholder="Senha"
-                                            className="border-gray-300 bg-gray-100 text-gray-800"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="confirmarSenha"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-gray-800">Confirmar Senha</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="password"
-                                            placeholder="Confirmar Senha"
-                                            className="border-gray-300 bg-gray-100 text-gray-800"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <div className="flex justify-center">
-                            <Button type="submit" variant="outline">
-                                Criar
-                            </Button>
-                        </div>
-                    </form>
-                </Form>
+        <div className="bg-white p-8 shadow-md rounded-lg w-full max-w-2xl">
+            <div className="flex items-center justify-between mb-4">
+                <div className="text-gray-700 font-bold pb-3 text-3xl">Adicionar Sócio</div>
+    
+                <HelperDialog title='Ajuda'>
+                    <div>
+                        {/* Conteúdo da ajuda aqui */}
+                        Insira os dados do sócio para criar um novo registro. Verifique se todos os campos estão corretos antes de enviar.
+                    </div>
+                </HelperDialog>
             </div>
-        </main>
-    );
+    
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    <FormField
+                        control={form.control}
+                        name="nome"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-gray-800">Nome</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        placeholder="Nome"
+                                        className="border-gray-300 bg-gray-100 text-gray-800"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+    
+                    <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-gray-800">Email</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        type="email"
+                                        placeholder="Email"
+                                        className="border-gray-300 bg-gray-100 text-gray-800"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+    
+                    <FormField
+                        control={form.control}
+                        name="cpf"
+                        render={({ field }) => (
+                            <FormItem className="flex flex-col">
+                                <FormLabel className="text-gray-800 mb-2">CPF</FormLabel>
+                                <FormControl>
+                                    <InputMask
+                                        mask="999.999.999-99"
+                                        placeholder="CPF"
+                                        className="border-gray-300 bg-gray-100 text-gray-800 w-full p-2 rounded-md"
+                                        value={field.value}
+                                        onChange={(e) => field.onChange(e.target.value)}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+    
+                    <FormField
+                        control={form.control}
+                        name="tipo"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-gray-800">Tipo de Usuário</FormLabel>
+                                <FormControl>
+                                    <select
+                                        className="bg-gray-100 text-gray-800 text-sm border border-gray-300 rounded-md p-2 w-full mt-1"
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                        defaultValue=""
+                                    >
+                                        <option value="" disabled>
+                                            Selecione o tipo do usuário
+                                        </option>
+                                        <option value="admin">Administrador</option>
+                                        <option value="user">Comum</option>
+                                    </select>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+    
+                    <FormField
+                        control={form.control}
+                        name="senha"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-gray-800">Senha</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        type="password"
+                                        placeholder="Senha"
+                                        className="border-gray-300 bg-gray-100 text-gray-800"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+    
+                    <FormField
+                        control={form.control}
+                        name="confirmarSenha"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-gray-800">Confirmar Senha</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        type="password"
+                                        placeholder="Confirmar Senha"
+                                        className="border-gray-300 bg-gray-100 text-gray-800"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+    
+                    <div className="flex justify-center">
+                        <Button type="submit" variant="outline">
+                            Criar
+                        </Button>
+                    </div>
+                </form>
+            </Form>
+        </div>
+    </main>
+    )
 }
+    

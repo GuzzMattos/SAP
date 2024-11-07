@@ -24,6 +24,7 @@ import { v4 as uuidv4 } from "uuid";
 import { createClient } from "@/app/_actions/client";
 import { parse, isValid, format } from "date-fns";
 import { TPartner } from "@/app/_actions/partner";
+import HelperDialog from "@/components/helper-dialog";
 
 interface IClientForm {
     partners: TPartner;
@@ -65,280 +66,270 @@ export default function AddClientForm({ partners }: IClientForm) {
     }
 
     return (
-        <main className="bg-gray-50 min-h-screen p-6 flex justify-center items-center">
-            <div className="bg-white p-8 shadow-md rounded-lg w-full max-w-2xl">
-                <div className="text-gray-700 font-bold pb-3 text-3xl text-center">Adicionar Cliente</div>
-
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <main className="bg-gray-50 min-h-screen p-6">
+        <div className="max-w-2xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
+            <div className="p-4 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                    <h1 className="text-gray-700 font-bold text-3xl">Adicionar Cliente</h1>
+    
+                    <HelperDialog title='Ajuda'>
+                        <div>
+                            {/* Conteúdo da ajuda aqui */}
+                            daskjdaksldjaksl
+                            <span>k COLMANZERA</span>
+                        </div>
+                    </HelperDialog>
+                </div>
+            </div>
+    
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="p-4 space-y-6">
+                    <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-gray-800">Nome</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        placeholder="Nome"
+                                        className="border-gray-300 bg-gray-100 text-gray-800"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField
                             control={form.control}
-                            name="name"
+                            name="cpf"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-gray-800">Nome</FormLabel>
+                                    <FormLabel className="text-gray-800">CPF</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            placeholder="Nome"
-                                            className="border-gray-300 bg-gray-100 text-gray-800"
-                                            {...field}
+                                        <InputMask
+                                            mask="999.999.999-99"
+                                            placeholder="CPF"
+                                            className="border-gray-300 bg-gray-100 text-gray-800 w-full p-2 rounded-md"
+                                            value={field.value}
+                                            onChange={(e) => field.onChange(e.target.value)}
                                         />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <FormField
-                                control={form.control}
-                                name="cpf"
-                                render={({ field }) => (
-                                    <FormItem className="flex flex-col">
-                                        <FormLabel className="text-gray-800 mb-2">CPF</FormLabel>
+    
+                        <FormField
+                            control={form.control}
+                            name="birthDate"
+                            render={({ field }) => {
+                                const [displayValue, setDisplayValue] = useState<string>(() =>
+                                    field.value ? format(field.value, "dd/MM/yyyy") : ""
+                                );
+    
+                                useEffect(() => {
+                                    setDisplayValue(field.value ? format(field.value, "dd/MM/yyyy") : "");
+                                }, [field.value]);
+    
+                                return (
+                                    <FormItem>
+                                        <FormLabel className="text-gray-800">Data de Nascimento</FormLabel>
                                         <FormControl>
                                             <InputMask
-                                                mask="999.999.999-99"
-                                                placeholder="CPF"
-                                                className="border-gray-300 bg-gray-100 text-gray-800 w-full p-2 rounded-md" // Adicione as mesmas classes aqui
-                                                value={field.value}
-                                                onChange={(e: ChangeEvent<HTMLInputElement>) => field.onChange(e.target.value)}
+                                                mask="99/99/9999"
+                                                value={displayValue}
+                                                onChange={(e) => {
+                                                    const dateValue = e.target.value;
+                                                    const parsedDate = parse(dateValue, "dd/MM/yyyy", new Date());
+                                                    if (isValid(parsedDate)) {
+                                                        field.onChange(parsedDate);
+                                                    } else {
+                                                        console.error("Data inválida");
+                                                    }
+                                                }}
+                                                className="bg-gray-100 text-gray-800 border border-gray-300 rounded-md p-2 w-full mt-1"
+                                                placeholder="dd/mm/aaaa"
                                             />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
-                                )}
-                            />
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <FormField
-                                    control={form.control}
-                                    name="birthDate"
-                                    render={({ field }) => {
-                                        const [displayValue, setDisplayValue] = useState<string>(() =>
-                                            field.value ? format(field.value, "dd/MM/yyyy") : ""
-                                        );
-
-                                        useEffect(() => {
-                                            // Atualiza o estado displayValue quando field.value muda
-                                            setDisplayValue(field.value ? format(field.value, "dd/MM/yyyy") : "");
-                                        }, [field.value]);
-
-                                        return (
-                                            <FormItem>
-                                                <FormLabel className="text-gray-800">Data de Nascimento</FormLabel>
-                                                <FormControl>
-                                                    <InputMask
-                                                        mask="99/99/9999"
-                                                        value={displayValue}
-                                                        onChange={(e) => {
-                                                            const dateValue = e.target.value;
-                                                            // Converte a string da data para uma instância de Date
-                                                            const parsedDate = parse(dateValue, "dd/MM/yyyy", new Date());
-                                                            if (isValid(parsedDate)) {
-                                                                field.onChange(parsedDate); // Atualiza o valor do campo com a data válida
-                                                            } else {
-                                                                console.error("Data inválida");
-                                                            }
-                                                        }}
-                                                        className="bg-gray-100 text-gray-800 border border-gray-300 rounded-md p-2 w-full mt-1"
-                                                        placeholder="dd/mm/aaaa"
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        );
-                                    }}
-                                />
-
-                            </div>
-
-
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <FormField
-                                control={form.control}
-                                name="maritalStatus"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-gray-800">Estado Civil</FormLabel>
-                                        <FormControl>
-                                            <select
-                                                className="bg-gray-100 text-gray-800 text-sm border border-gray-300 rounded-md p-2 w-full mt-1"
-                                                value={field.value}
-                                                onChange={field.onChange}
-                                            >
-                                                <option value="Casado">Casado</option>
-                                                <option value="Solteiro">Solteiro</option>
-                                                <option value="Divorciado">Divorciado</option>
-                                                <option value="Viúvo">Viúvo</option>
-                                            </select>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            {maritalStatus === "Casado" && (
-                                <FormField
-                                    control={form.control}
-                                    name="propertyRegime"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-gray-800">Regime de Bens</FormLabel>
-                                            <FormControl>
-                                                <select
-                                                    className="bg-gray-100 text-gray-800 text-sm border border-gray-300 rounded-md p-2 w-full mt-1"
-                                                    value={field.value}
-                                                    onChange={field.onChange}
-                                                >
-                                                    <option value="" disabled>Selecione um regime de bens</option>
-                                                    <option value="Separação total de bens">Separação total de bens</option>
-                                                    <option value="Comunhão parcial de bens">Comunhão parcial de bens</option>
-                                                    <option value="Comunhão universal de bens">Comunhão universal de bens</option>
-                                                    <option value="Participação final nos aquestos">Participação final nos aquestos</option>
-                                                </select>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            )}
-                        </div>
-
-                        <FormField
-                            control={form.control}
-                            name="dualNationality"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-gray-800">Dupla Nacionalidade</FormLabel>
-                                    <FormControl>
-                                        <div className="flex items-center gap-4">
-                                            <Checkbox
-                                                className="border-black"
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-                                            />
-                                            <span className="text-gray-800">Sim</span>
-                                            <Checkbox
-                                                className="border-black"
-                                                checked={!field.value}
-                                                onCheckedChange={() => field.onChange(!field.value)}
-                                            />
-                                            <span className="text-gray-800">Não</span>
-                                        </div>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
+                                );
+                            }}
                         />
-
+                    </div>
+    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField
                             control={form.control}
-                            name="taxResidenceInBrazil"
+                            name="maritalStatus"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-gray-800">Residência Fiscal no Brasil</FormLabel>
-                                    <FormControl>
-                                        <div className="flex items-center gap-4">
-                                            <Checkbox
-                                                className="border-black"
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-                                            />
-                                            <span className="text-gray-800">Sim</span>
-                                            <Checkbox
-                                                className="border-black"
-                                                checked={!field.value}
-                                                onCheckedChange={() => field.onChange(!field.value)}
-                                            />
-                                            <span className="text-gray-800">Não</span>
-                                        </div>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={form.control}
-                            name="profession"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-gray-800">Profissão</FormLabel>
+                                    <FormLabel className="text-gray-800">Estado Civil</FormLabel>
                                     <FormControl>
                                         <select
                                             className="bg-gray-100 text-gray-800 text-sm border border-gray-300 rounded-md p-2 w-full mt-1"
                                             value={field.value}
                                             onChange={field.onChange}
                                         >
-                                            <option value="" disabled>
-                                                Selecione uma profissão
-                                            </option>
-                                            {professions.map((profession) => (
-                                                <option key={profession} value={profession}>
-                                                    {profession}
-                                                </option>
-                                            ))}
+                                            <option value="Casado">Casado</option>
+                                            <option value="Solteiro">Solteiro</option>
+                                            <option value="Divorciado">Divorciado</option>
+                                            <option value="Viúvo">Viúvo</option>
                                         </select>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
-                        <FormField
-                            control={form.control}
-                            name="partnerId"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-gray-800">Sócio</FormLabel>
-                                    <FormControl>
-                                        <select
-                                            className="bg-gray-100 text-gray-800 text-sm border border-gray-300 rounded-md p-2 w-full mt-1"
-                                            value={field.value || ""} // Garante que a opção padrão seja selecionada inicialmente
-                                            onChange={field.onChange}
-                                        >
-                                            <option value="" disabled>
-                                                Selecione um sócio
-                                            </option>
-                                            {partners.map((p) => (
-                                                <option key={p.id_user} value={p.id_user}>
-                                                    {p.nome}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="email"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-gray-800">Email</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="email"
-                                            placeholder="Email"
-                                            className="border-gray-300 bg-gray-100 text-gray-800"
-                                            {...field}
+    
+                        {form.watch("maritalStatus") === "Casado" && (
+                            <FormField
+                                control={form.control}
+                                name="propertyRegime"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-gray-800">Regime de Bens</FormLabel>
+                                        <FormControl>
+                                            <select
+                                                className="bg-gray-100 text-gray-800 text-sm border border-gray-300 rounded-md p-2 w-full mt-1"
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                            >
+                                                <option value="" disabled>Selecione um regime de bens</option>
+                                                <option value="Separação total de bens">Separação total de bens</option>
+                                                <option value="Comunhão parcial de bens">Comunhão parcial de bens</option>
+                                                <option value="Comunhão universal de bens">Comunhão universal de bens</option>
+                                                <option value="Participação final nos aquestos">Participação final nos aquestos</option>
+                                            </select>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        )}
+                    </div>
+    
+                    <FormField
+                        control={form.control}
+                        name="dualNationality"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-gray-800">Dupla Nacionalidade</FormLabel>
+                                <FormControl>
+                                    <div className="flex items-center gap-4">
+                                        <Checkbox
+                                            className="border-black"
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
                                         />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <div className="flex justify-center">
-                            <Button type="submit" variant="outline">
-                                Criar Cliente
-                            </Button>
-                        </div>
-                    </form>
-                </Form>
-            </div>
-        </main>
-    );
+                                        <span className="text-gray-800">Sim</span>
+                                        <Checkbox
+                                            className="border-black"
+                                            checked={!field.value}
+                                            onCheckedChange={() => field.onChange(!field.value)}
+                                        />
+                                        <span className="text-gray-800">Não</span>
+                                    </div>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+    
+                    <FormField
+                        control={form.control}
+                        name="taxResidenceInBrazil"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-gray-800">Residência Fiscal no Brasil</FormLabel>
+                                <FormControl>
+                                    <div className="flex items-center gap-4">
+                                        <Checkbox
+                                            className="border-black"
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                        />
+                                        <span className="text-gray-800">Sim</span>
+                                        <Checkbox
+                                            className="border-black"
+                                            checked={!field.value}
+                                            onCheckedChange={() => field.onChange(!field.value)}
+                                        />
+                                        <span className="text-gray-800">Não</span>
+                                    </div>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+    
+                    <FormField
+                        control={form.control}
+                        name="profession"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-gray-800">Profissão</FormLabel>
+                                <FormControl>
+                                    <select
+                                        className="bg-gray-100 text-gray-800 text-sm border border-gray-300 rounded-md p-2 w-full mt-1"
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                    >
+                                        <option value="" disabled>
+                                            Selecione uma profissão
+                                        </option>
+                                        {professions.map((profession) => (
+                                            <option key={profession} value={profession}>
+                                                {profession}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+    
+                    <FormField
+                        control={form.control}
+                        name="partnerId"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-gray-800">Sócio</FormLabel>
+                                <FormControl>
+                                    <select
+                                        className="bg-gray-100 text-gray-800 text-sm border border-gray-300 rounded-md p-2 w-full mt-1"
+                                        value={field.value || ""}
+                                        onChange={field.onChange}
+                                    >
+                                        <option value="" disabled>
+                                            Selecione um sócio
+                                        </option>
+                                        {partners.map((p) => (
+                                            <option key={p.id_user} value={p.id_user}>
+                                                {p.nome}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+    
+                    <div className="flex justify-center">
+                        <Button type="submit" variant="outline">
+                            Criar Cliente
+                        </Button>
+                    </div>
+                </form>
+            </Form>
+        </div>
+    </main>
+    )
 }
+    

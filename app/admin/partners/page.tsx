@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/pagination";
 import { getAllPartners, TPartner, deletePartner } from "@/app/_actions/partner";
 import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import HelperDialog from '@/components/helper-dialog';
 
 export default function PartnersPage() {
   const [partners, setPartners] = useState<TPartner>([]);
@@ -72,11 +73,19 @@ export default function PartnersPage() {
   //aaaaa
   return (
     <main className="bg-gray-50 min-h-screen p-6 rounded">
-      <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <div className="p-4 border-b border-gray-200 rounded">
-          <div className="mb-4">
-            <div className="justify-start text-start text-gray-700 font-bold pb-3 text-3xl">Sócios</div>
+  <div className="bg-white shadow-md rounded-lg overflow-hidden">
+    <div className="p-4 border-b border-gray-200 rounded">
+      <div className="mb-4">
+        <div className="w-full flex items-center justify-between">
+          <h1 className="justify-start text-start text-gray-700 font-bold pb-3 text-3xl">Sócios</h1>
 
+          <HelperDialog title="SÓCIOS">
+            <div>
+              Página dedicada ao cadastro de Sócios.
+            </div>
+          </HelperDialog>
+            </div>
+           
             <input
               type="text"
               placeholder="Buscar por nome ou CPF"
