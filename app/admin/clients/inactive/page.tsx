@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from "next/link";
-import { EditIcon, TrashIcon } from "lucide-react";
+import { EditIcon, TrashIcon, ArrowBigUp } from "lucide-react";
 import { Button } from '@/components/ui/button';
 import {
     Pagination,
@@ -13,12 +13,14 @@ import {
     PaginationNext,
     PaginationPrevious
 } from "@/components/ui/pagination";
-import { deleteClient, getAllClients, TClient } from '@/app/_actions/client';
+import { activateClient, getInactiveClients, TInactiveClient } from '@/app/_actions/client';
 import HelperDialog from '@/components/helper-dialog';
 import { DialogTrigger, Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle } from '@/components/ui/dialog';
+import { redirect } from "next/navigation";
+
 
 export default function ClientsPage() {
-    const [clients, setClients] = useState<TClient>([]);
+    const [clients, setClients] = useState<TInactiveClient>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
@@ -29,7 +31,7 @@ export default function ClientsPage() {
     useEffect(() => {
         const fetchClients = async () => {
             try {
-                const response = await getAllClients()
+                const response = await getInactiveClients()
 
                 setClients(response);
             } catch (error) {
@@ -38,15 +40,16 @@ export default function ClientsPage() {
         };
 
         fetchClients();
-    }, [clients, setClients]);
+    }, []);
 
-    const confirmDeleteClient = async () => {
+    const confirmActivateClient = async () => {
         if (selectedClientId) {
             try {
-                await deleteClient(selectedClientId);
+                await activateClient(selectedClientId);
                 setSelectedClientId(null)
                 setSelectedClientName(null)
                 setDialogOpen(false);;
+                redirect("/admin/clients");
             } catch (error: any) {
                 console.log(error.message);  // Captura a mensagem de erro para exibição
             }
@@ -89,12 +92,12 @@ export default function ClientsPage() {
 
                 {/* Contêiner do título e HelperDialog */}
                 <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-                    <h1 className="text-gray-700 font-bold text-3xl">Clientes Ativos</h1>
+                    <h1 className="text-gray-700 font-bold text-3xl">Clientes Inativos</h1>
 
                     {/* HelperDialog no canto superior direito */}
                     <HelperDialog title="Ajuda">
                         <div>
-                            Aqui você pode gerenciar seus clientes. Utilize o campo de busca para filtrar por nome ou CPF.
+                            Aqui você pode gerenciar seus clientes inativos. Utilize o campo de busca para filtrar por nome ou CPF.
                         </div>
                     </HelperDialog>
                 </div>
@@ -130,39 +133,32 @@ export default function ClientsPage() {
                                 {client.cpf}
                             </div>
                             <div className="flex items-center justify-end space-x-2">
-                                <button
-                                    aria-label="Edit"
-                                    className="p-1 rounded hover:bg-gray-200"
-                                >
-                                    <Link href={`/admin/clients/${client.id_cliente}/editClient`} className="text-gray-600 hover:underline">
-                                        <EditIcon className="w-5 h-5 text-gray-600" />
-                                    </Link>
-                                </button>
+
                                 <Dialog open={dialogOpen} key={client.id_cliente} onOpenChange={setDialogOpen}>
                                     <DialogTrigger asChild>
                                         <button
                                             key={client.id_cliente}
-                                            aria-label="Delete"
-                                            className="p-1 rounded hover:bg-gray-200"
+                                            aria-label="Ativar"
+                                            className="p-1 rounded hover:bg-gray-200 mr-5"
                                             onClick={() => {
                                                 setSelectedClientId(client.id_cliente);
                                                 setSelectedClientName(client.nome)
                                                 setDialogOpen(true); // Abre o diálogo quando clica em deletar
                                             }}
                                         >
-                                            <TrashIcon className="w-5 h-5 text-red-600" />
+                                            <ArrowBigUp className="w-5 h-5 text-green-600" />
                                         </button>
                                     </DialogTrigger>
                                     <DialogContent>
-                                        <DialogTitle>Confirmar Exclusão</DialogTitle>
+                                        <DialogTitle>Confirmar Ativação</DialogTitle>
                                         <DialogDescription>
-                                            Tem certeza de que deseja excluir o cliente {selectedClientName}?
+                                            Tem certeza de que deseja ativar o cliente {selectedClientName}?
                                         </DialogDescription>
                                         <DialogFooter>
                                             <Button variant="outline" onClick={() => setDialogOpen(false)}>
                                                 Cancelar
                                             </Button>
-                                            <Button variant="destructive" onClick={confirmDeleteClient}>
+                                            <Button variant="destructive" onClick={confirmActivateClient}>
                                                 Confirmar
                                             </Button>
                                         </DialogFooter>
@@ -174,14 +170,6 @@ export default function ClientsPage() {
                 </div>
 
                 {/* Botão Adicionar Novo */}
-                <div className="flex justify-between p-4">
-                    <Link href="/admin/clients/inactive">
-                        <Button variant="outline">Clientes Inativos</Button>
-                    </Link>
-                    <Link href="/admin/clients/addClient">
-                        <Button variant="outline">Adicionar Novo</Button>
-                    </Link>
-                </div>
 
                 {/* Paginação */}
                 <Pagination className="text-white p-2 rounded-lg">

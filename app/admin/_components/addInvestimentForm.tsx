@@ -86,7 +86,7 @@ export default function InvestimentForm({ clientId, indice }: IInvestimentForm) 
                             name="banco"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-gray-800">Banco</FormLabel>
+                                    <FormLabel className="text-gray-800 flex">Banco <div className="text-red-600">*</div></FormLabel>
                                     <FormControl>
                                         <select
                                             className="bg-gray-100 text-gray-800 text-sm border border-gray-300 rounded-md p-2 w-full mt-1"
@@ -113,7 +113,7 @@ export default function InvestimentForm({ clientId, indice }: IInvestimentForm) 
                             name="agencia"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-gray-800">Agência</FormLabel>
+                                    <FormLabel className="text-gray-800 flex">Agência<div className="text-red-600">*</div></FormLabel>
                                     <FormControl>
                                         <InputMask
                                             mask="9999-9" // Máscara para a agência
@@ -133,7 +133,7 @@ export default function InvestimentForm({ clientId, indice }: IInvestimentForm) 
                             name="conta"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-gray-800">Conta</FormLabel>
+                                    <FormLabel className="text-gray-800 flex">Conta <div className="text-red-600">*</div></FormLabel>
                                     <FormControl>
                                         <InputMask
                                             mask="99999-9" // Máscara para a conta

@@ -105,8 +105,8 @@ export default function EditPartnerPage({ params }: { params: { partnerId: strin
                                     </SelectTrigger>
                                     <SelectContent>
                                         {/* Opções válidas */}
-                                        <SelectItem value="Administrador">Administrador</SelectItem>
-                                        <SelectItem value="Comum">Comum</SelectItem>
+                                        <SelectItem value="admin">Administrador</SelectItem>
+                                        <SelectItem value="user">Comum</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>

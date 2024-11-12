@@ -37,8 +37,8 @@ export default function AddClientForm({ partners }: IClientForm) {
             name: "",
             cpf: "",
             birthDate: new Date(),
-            dualNationality: false,
             maritalStatus: "Solteiro",
+            dualNationality: false,
             propertyRegime: "",
             taxResidenceInBrazil: false,
             email: "",
@@ -94,6 +94,24 @@ export default function AddClientForm({ partners }: IClientForm) {
                                     <FormLabel className="text-gray-800">Nome</FormLabel>
                                     <FormControl>
                                         <Input
+                                            placeholder="Nome"
+                                            className="border-gray-300 bg-gray-100 text-gray-800"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="email"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="text-gray-800">Email</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="email"
                                             placeholder="Nome"
                                             className="border-gray-300 bg-gray-100 text-gray-800"
                                             {...field}
@@ -313,7 +331,14 @@ export default function AddClientForm({ partners }: IClientForm) {
                         />
 
                         <div className="flex justify-center">
-                            <Button type="submit" variant="outline" disabled={form.formState.isSubmitting}>
+                            <Button
+                                type="submit"
+                                variant="outline"
+                                disabled={form.formState.isSubmitting}
+                                onClick={() => {
+                                    console.log(form.formState.errors)
+                                }}
+                            >
                                 Criar Cliente
                             </Button>
                         </div>

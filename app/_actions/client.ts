@@ -6,6 +6,7 @@ import prisma from "@/lib/db";
 import { redirect } from "next/navigation";
 import { GetUserId, GetUserRole } from "./user";
 import { Prisma } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 export async function createClient(values: z.infer<typeof ClientSchema>) {
     console.log("Creating client with data:", values);
@@ -49,7 +50,9 @@ export async function getAllClients() {
     const role = await GetUserRole()
     const userId = await GetUserId()
 
-    let whereCondition: Prisma.ClienteWhereInput = {}
+    let whereCondition: Prisma.ClienteWhereInput = {
+        ativo: true,
+    }
 
     if (role !== "admin") {
         whereCondition = {
@@ -131,25 +134,98 @@ export async function updateClientById(clientId: string, values: z.infer<typeof 
         throw new Error("Cliente não encontrado");
     }
 
-    const updatedData: any = {
-        nome: values.name,
-        cpf: values.cpf,
-        email: values.email,
-        data_nasc: values.birthDate ? new Date(values.birthDate) : existingClient.data_nasc,
-        est_civil: values.maritalStatus ?? existingClient.est_civil,
-        dupla_nacio: values.dualNationality ?? existingClient.dupla_nacio,
-        reg_bens: values.propertyRegime ?? existingClient.reg_bens,
-        res_fiscal_brasil: values.taxResidenceInBrazil ?? existingClient.res_fiscal_brasil,
-        profissao: values.profession ?? existingClient.profissao,
-        id_user: values.partnerId ?? existingClient.id_user
-    };
-
     // Atualiza os dados no banco
     const updatedClient = await prisma.cliente.update({
         where: { id_cliente: clientId },
-        data: updatedData,
+        data: values,
     });
 
-    console.log("Client atualizado:", updatedClient);
+    console.log({ values, updateClient })
+    return updatedClient;
+}
+
+export async function deleteClient(clientId: string) {
+    // Verifica se o cliente existe pelo ID
+    const existingClient = await prisma.cliente.findUnique({
+        where: {
+            id_cliente: clientId,
+        },
+    });
+
+    if (!existingClient) {
+        throw new Error("Cliente não encontrado");
+    }
+
+    // Atualiza o campo 'ativo' para false
+    const updatedClient = await prisma.cliente.update({
+        where: {
+            id_cliente: clientId,
+        },
+        data: {
+            ativo: false,
+        },
+    });
+
+    console.log("Client desativado:", updatedClient);
+
+    revalidatePath("/admin/clients", "layout")
+}
+
+
+export async function getInactiveClients() {
+    const role = await GetUserRole();
+    const userId = await GetUserId();
+
+    // Definir condição inicial para buscar clientes inativos
+    let whereCondition: Prisma.ClienteWhereInput = {
+        ativo: false,
+    };
+
+    // Se o usuário não for admin, filtrar apenas pelos clientes associados ao usuário
+    if (role !== "admin") {
+        whereCondition = {
+            ativo: false,
+            id_user: {
+                equals: userId,
+            },
+        };
+    }
+
+    // Buscar clientes inativos com base nas condições definidas
+    const inactiveClients = await prisma.cliente.findMany({
+        where: whereCondition,
+    });
+
+    return inactiveClients;
+}
+
+export type TInactiveClient = Awaited<ReturnType<typeof getInactiveClients>>;
+
+
+export async function activateClient(clientId: string) {
+    // Verifica se o cliente existe pelo ID
+    const existingClient = await prisma.cliente.findUnique({
+        where: {
+            id_cliente: clientId,
+        },
+    });
+
+    if (!existingClient) {
+        throw new Error("Cliente não encontrado");
+    }
+
+    // Atualiza o campo 'ativo' para true
+    const updatedClient = await prisma.cliente.update({
+        where: {
+            id_cliente: clientId,
+        },
+        data: {
+            ativo: true,
+        },
+    });
+
+    console.log("Client ativado:", updatedClient);
+
+    // Redireciona para a página de clientes
     return updatedClient;
 }

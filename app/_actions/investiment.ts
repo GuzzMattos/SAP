@@ -38,6 +38,18 @@ export async function createInvestiment(clientId: string, values: z.infer<typeof
 // Função para obter todos os Investiments
 export async function getAllInvestiments() {
     const allInvestiments = await prisma.investimento.findMany({});
+
+    allInvestiments.map(i => {
+        if (i.data_venc > new Date()) {
+            prisma.investimento.update({
+                where: { id_invest: i.id_invest },
+                data:
+                {
+                    ativo: false,
+                }
+            })
+        }
+    })
     return allInvestiments;
 }
 

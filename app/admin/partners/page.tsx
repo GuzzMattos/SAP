@@ -22,6 +22,7 @@ export default function PartnersPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedPartnerId, setSelectedPartnerId] = useState<string | null>(null);
+  const [selectedPartnerName, setSelectedPartnerName] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const partnersPerPage = 10;
@@ -59,7 +60,9 @@ export default function PartnersPage() {
       try {
         await deletePartner(selectedPartnerId);
         setPartners(partners.filter(partner => partner.id_user !== selectedPartnerId));
-        setSelectedPartnerId(null);
+        setSelectedPartnerId(null)
+        setSelectedPartnerName(null)
+        setDialogOpen(false);;
       } catch (error: any) {
         setError(error.message);  // Captura a mensagem de erro para exibição
       }
@@ -73,19 +76,19 @@ export default function PartnersPage() {
   //aaaaa
   return (
     <main className="bg-gray-50 min-h-screen p-6 rounded">
-  <div className="bg-white shadow-md rounded-lg overflow-hidden">
-    <div className="p-4 border-b border-gray-200 rounded">
-      <div className="mb-4">
-        <div className="w-full flex items-center justify-between">
-          <h1 className="justify-start text-start text-gray-700 font-bold pb-3 text-3xl">Sócios</h1>
+      <div className="bg-white shadow-md rounded-lg overflow-hidden">
+        <div className="p-4 border-b border-gray-200 rounded">
+          <div className="mb-4">
+            <div className="w-full flex items-center justify-between">
+              <h1 className="justify-start text-start text-gray-700 font-bold pb-3 text-3xl">Sócios</h1>
 
-          <HelperDialog title="SÓCIOS">
-            <div>
-              Página dedicada ao cadastro de Sócios.
+              <HelperDialog title="SÓCIOS">
+                <div>
+                  Página dedicada ao gereciamento de Sócios.
+                </div>
+              </HelperDialog>
             </div>
-          </HelperDialog>
-            </div>
-           
+
             <input
               type="text"
               placeholder="Buscar por nome ou CPF"
@@ -124,7 +127,7 @@ export default function PartnersPage() {
                   </Link>
 
                 </button>
-                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <Dialog open={dialogOpen} key={partner.id_user} onOpenChange={setDialogOpen}>
                   <DialogTrigger asChild>
                     <button
                       key={partner.id_user}
@@ -132,6 +135,7 @@ export default function PartnersPage() {
                       className="p-1 rounded hover:bg-gray-200"
                       onClick={() => {
                         setSelectedPartnerId(partner.id_user);
+                        setSelectedPartnerName(partner.nome)
                         setDialogOpen(true); // Abre o diálogo quando clica em deletar
                       }}
                     >
@@ -141,7 +145,7 @@ export default function PartnersPage() {
                   <DialogContent>
                     <DialogTitle>Confirmar Exclusão</DialogTitle>
                     <DialogDescription>
-                      Tem certeza de que deseja excluir o sócio {partner.nome}?
+                      Tem certeza de que deseja excluir o sócio {selectedPartnerName}?
                     </DialogDescription>
                     <DialogFooter>
                       <Button variant="outline" onClick={() => setDialogOpen(false)}>
