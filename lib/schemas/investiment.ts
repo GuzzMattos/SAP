@@ -17,6 +17,7 @@ export const InvestimentSchema = z.object({
     isento: z.boolean(),
     pais: z.string().min(1, { message: "País é obrigatório" }).max(30, { message: "País deve ter no máximo 30 caracteres" }),
     valor: z.number().min(0, { message: "Valor deve ser um número positivo" }),
+    ativo: z.boolean(),
 });
 
 export type TInvestimentSchema = z.infer<typeof InvestimentSchema>;

@@ -24,7 +24,8 @@ export async function createInvestiment(clientId: string, values: z.infer<typeof
             isento: values.isento,
             pais: values.pais,
             valor: values.valor,
-            id_indice: values.id_indice ?? null // Corrigido para passar apenas a string `id_indice`
+            id_indice: values.id_indice ?? null, // Corrigido para passar apenas a string `id_indice`
+            ativo: true,
         }
     });
 

@@ -47,6 +47,7 @@ export default function InvestimentForm({ clientId, indice }: IInvestimentForm) 
             isento: false,
             pais: "",
             valor: 0,
+            ativo: true,
         },
     });
 
@@ -66,44 +67,44 @@ export default function InvestimentForm({ clientId, indice }: IInvestimentForm) 
 
     return (
         <main className="bg-gray-50 min-h-screen p-6 flex justify-center items-center">
-        <div className="bg-white p-8 shadow-md rounded-lg w-full max-w-2xl">
-            <div className="flex items-center justify-between mb-4">
-                <div className="text-gray-700 font-bold pb-3 text-3xl">Adicionar Investimento</div>
-        
-                <HelperDialog title='Ajuda'>
-                    <div>
-                        {/* Conteúdo da ajuda aqui */}
-                        Selecione o banco com o qual deseja realizar as operações. Certifique-se de que o banco desejado está na lista antes de prosseguir.
-                    </div>
-                </HelperDialog>
-            </div>
-    
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                    <FormField
-                        control={form.control}
-                        name="banco"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className="text-gray-800">Banco</FormLabel>
-                                <FormControl>
-                                    <select
-                                        className="bg-gray-100 text-gray-800 text-sm border border-gray-300 rounded-md p-2 w-full mt-1"
-                                        value={field.value}
-                                        onChange={field.onChange}
-                                    >
-                                        <option value="" disabled>
-                                            Selecione um Banco
-                                        </option>
-                                        <option value="xp">XP Investimentos</option>
-                                        <option value="bradesco">Bradesco</option>
-                                        <option value="itau">Itaú</option>
-                                        <option value="nubank">Nubank</option>
-                                        <option value="c6">C6 Bank</option>
-                                    </select>
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
+            <div className="bg-white p-8 shadow-md rounded-lg w-full max-w-2xl">
+                <div className="flex items-center justify-between mb-4">
+                    <div className="text-gray-700 font-bold pb-3 text-3xl">Adicionar Investimento</div>
+
+                    <HelperDialog title='Ajuda'>
+                        <div>
+                            {/* Conteúdo da ajuda aqui */}
+                            Selecione o banco com o qual deseja realizar as operações. Certifique-se de que o banco desejado está na lista antes de prosseguir.
+                        </div>
+                    </HelperDialog>
+                </div>
+
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                        <FormField
+                            control={form.control}
+                            name="banco"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="text-gray-800">Banco</FormLabel>
+                                    <FormControl>
+                                        <select
+                                            className="bg-gray-100 text-gray-800 text-sm border border-gray-300 rounded-md p-2 w-full mt-1"
+                                            value={field.value}
+                                            onChange={field.onChange}
+                                        >
+                                            <option value="" disabled>
+                                                Selecione um Banco
+                                            </option>
+                                            <option value="xp">XP Investimentos</option>
+                                            <option value="bradesco">Bradesco</option>
+                                            <option value="itau">Itaú</option>
+                                            <option value="nubank">Nubank</option>
+                                            <option value="c6">C6 Bank</option>
+                                        </select>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
                             )}
                         />
 

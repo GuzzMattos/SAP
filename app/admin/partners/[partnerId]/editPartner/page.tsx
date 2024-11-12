@@ -1,199 +1,137 @@
 "use client";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getPartnerById, updatePartnerById } from "@/app/_actions/partner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-import { PartnerSchema } from "@/lib/schemas/partner";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { getPartnerById, updatePartner } from "@/app/_actions/partner";
-import InputMask from "react-input-mask";
 
-export default function EditPartnerForm() {
+export default function EditPartnerPage({ params }: { params: { partnerId: string } }) {
     const router = useRouter();
-    const { id } = useParams();
-    const partnerId = Array.isArray(id) ? id[0] : id; // Confirma que `id` é uma string
-
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    const form = useForm<z.infer<typeof PartnerSchema>>({
-        resolver: zodResolver(PartnerSchema),
-        defaultValues: {
-            nome: "",
-            email: "",
-            cpf: "",
-            tipo: "user",
-            senha: "",
-        },
+    const [partner, setPartner] = useState<any>({
+        nome: '',
+        email: '',
+        cpf: '',
+        tipo: 'user',
+        senha: '',
+        confirmarSenha: ''
     });
+    const [activeTab, setActiveTab] = useState("Detalhes");
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        if (!partnerId) {
-            setError("ID do sócio não encontrado.");
-            setLoading(false);
-            return;
-        }
-
-        const fetchPartnerData = async () => {
+        const fetchPartner = async () => {
             try {
-                const data = await getPartnerById(partnerId);
-                if (data) {
-                    form.reset({
-                        ...data,
-                        tipo: data.tipo === "admin" ? "admin" : "user",
-                    });
-                } else {
-                    throw new Error("Dados do sócio não encontrados.");
-                }
+                const data = await getPartnerById(params.partnerId);
+                setPartner(data);
             } catch (error) {
-                console.error("Erro ao carregar dados do sócio:", error);
-                setError("Erro ao carregar dados do sócio.");
-            } finally {
-                setLoading(false);
+                console.error("Failed to fetch partner", error);
             }
         };
 
-        fetchPartnerData();
-    }, [partnerId, form]);
+        fetchPartner();
+    }, [params.partnerId]);
 
-    async function onSubmit(values: z.infer<typeof PartnerSchema>) {
-        try {
-            await updatePartner(partnerId, values);
-            alert("Dados atualizados com sucesso!");
-            router.push("/admin/partners");
-        } catch (error) {
-            console.error("Erro ao atualizar sócio:", error);
-            alert("Erro ao atualizar sócio!");
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { id, value } = e.target;
+        setPartner({ ...partner, [id]: value });
+    };
+
+    const handleSave = async () => {
+        if (partner.senha !== partner.confirmarSenha) {
+            alert('As senhas não coincidem!');
+            return;
         }
+
+        setIsLoading(true);
+        try {
+            await updatePartnerById(params.partnerId, partner);
+            alert('Partner atualizado com sucesso!');
+            router.push(`/admin/partners`);
+        } catch (error) {
+            console.error("Failed to update partner", error);
+            alert('Erro ao atualizar o partner.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    if (!partner) {
+        return <div>Loading...</div>;
     }
 
-    if (loading) return <p>Carregando dados do sócio...</p>;
-
-    if (error) return <p>{error}</p>;
-
     return (
-        <main className="bg-gray-50 min-h-screen p-6 flex justify-center items-center">
-            <div className="bg-white p-8 shadow-md rounded-lg w-full max-w-2xl">
-                <div className="text-gray-700 font-bold pb-3 text-3xl text-center">Editar Sócio</div>
+        <main className="bg-gray-50 min-h-screen p-6">
+            <Card className="p-6 max-w-full mx-auto bg-white shadow-md rounded-lg">
+                <Tabs value={activeTab} onValueChange={setActiveTab}>
+                    <TabsList className="border-b border-gray-300 mb-4">
+                        <TabsTrigger value="Detalhes" className="py-2 px-4 text-gray-400 hover:text-blue-500 focus:outline-none focus:ring-0">
+                            Detalhes
+                        </TabsTrigger>
+                        {/* <TabsTrigger value="Outras Informações" className="py-2 px-4 text-gray-400 hover:text-blue-500 focus:outline-none focus:ring-0">
+                            Clientes
+                        </TabsTrigger> */}
+                    </TabsList>
 
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                        <FormField
-                            control={form.control}
-                            name="nome"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-gray-800">Nome</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            placeholder="Nome"
-                                            className="border-gray-300 bg-gray-100 text-gray-800"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                    {activeTab === "Detalhes" && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div>
+                                <Label htmlFor="nome" className="text-gray-700">Nome</Label>
+                                <Input id="nome" value={partner.nome} onChange={handleChange} className="bg-white text-gray-800" />
+                            </div>
 
-                        <FormField
-                            control={form.control}
-                            name="email"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-gray-800">Email</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="email"
-                                            placeholder="Email"
-                                            className="border-gray-300 bg-gray-100 text-gray-800"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                            <div>
+                                <Label htmlFor="email" className="text-gray-700">Email</Label>
+                                <Input id="email" value={partner.email} onChange={handleChange} className="bg-white text-gray-800" />
+                            </div>
 
-                        <FormField
-                            control={form.control}
-                            name="cpf"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-gray-800">CPF</FormLabel>
-                                    <FormControl>
-                                        <InputMask
-                                            mask="999.999.999-99"
-                                            placeholder="CPF"
-                                            className="border-gray-300 bg-gray-100 text-gray-800 w-full p-2 rounded-md"
-                                            value={field.value}
-                                            onChange={(e) => field.onChange(e.target.value)}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                            <div>
+                                <Label htmlFor="cpf" className="text-gray-700">CPF</Label>
+                                <Input id="cpf" value={partner.cpf} onChange={handleChange} className="bg-white text-gray-800" />
+                            </div>
 
-                        <FormField
-                            control={form.control}
-                            name="tipo"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-gray-800">Tipo de Usuário</FormLabel>
-                                    <FormControl>
-                                        <select
-                                            className="bg-gray-100 text-gray-800 text-sm border border-gray-300 rounded-md p-2 w-full mt-1"
-                                            value={field.value}
-                                            onChange={field.onChange}
-                                        >
-                                            <option value="admin">Administrador</option>
-                                            <option value="user">Comum</option>
-                                        </select>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                            <div>
+                                <Label htmlFor="tipo" className="text-gray-700">Tipo</Label>
+                                <Select
+                                    value={partner.tipo || undefined}
+                                    onValueChange={(value) => setPartner({ ...partner, tipo: value })}
+                                >
+                                    <SelectTrigger className="bg-white text-gray-800">
+                                        <SelectValue placeholder="Selecione o tipo" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {/* Opções válidas */}
+                                        <SelectItem value="Administrador">Administrador</SelectItem>
+                                        <SelectItem value="Comum">Comum</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div>
+                                <Label htmlFor="senha" className="text-gray-700">Senha</Label>
+                                <Input type="password" id="senha" value={partner.senha} onChange={handleChange} className="bg-white text-gray-800" />
+                            </div>
 
-                        <FormField
-                            control={form.control}
-                            name="senha"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-gray-800">Senha</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="password"
-                                            placeholder="Senha"
-                                            className="border-gray-300 bg-gray-100 text-gray-800"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <div className="flex justify-center">
-                            <Button type="submit" variant="outline">
-                                Salvar Alterações
-                            </Button>
+                            <div>
+                                <Label htmlFor="confirmarSenha" className="text-gray-700">Confirmar Senha</Label>
+                                <Input type="password" id="confirmarSenha" value={partner.confirmarSenha} onChange={handleChange} className="bg-white text-gray-800" />
+                            </div>
                         </div>
-                    </form>
-                </Form>
-            </div>
+                    )}
+                </Tabs>
+
+                <div className="mt-6 flex justify-end space-x-4">
+                    <Button variant="outline" onClick={() => router.push(`/admin/partners/${params.partnerId}`)}>
+                        Cancelar
+                    </Button>
+                    <Button onClick={handleSave} disabled={isLoading}>
+                        {isLoading ? 'Salvando...' : 'Salvar'}
+                    </Button>
+                </div>
+            </Card>
         </main>
     );
 }

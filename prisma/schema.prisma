@@ -37,6 +37,7 @@ model Cliente {
   profissao         String   @db.VarChar(258)
   id_user           String   @db.Char(36)
   user              Usuario  @relation(fields: [id_user], references: [id_user])
+  ativo             Boolean
 
   Familiar     Familiar[]
   Investimento Investimento[]
@@ -75,6 +76,7 @@ model Investimento {
   valor          Float
   id_indice      String
   indice         Indice   @relation(fields: [id_indice], references: [id_indice])
+  ativo          Boolean
 }
 
 model Indice {
