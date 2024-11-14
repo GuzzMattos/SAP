@@ -16,6 +16,7 @@ import {
 import { getAllPartners, TPartner, deletePartner } from "@/app/_actions/partner";
 import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import HelperDialog from '@/components/helper-dialog';
+import RouterBackButton from '@/components/router-back-button';
 
 export default function PartnersPage() {
   const [partners, setPartners] = useState<TPartner>([]);
@@ -81,6 +82,7 @@ export default function PartnersPage() {
         <div className="p-4 border-b border-gray-200 rounded">
           <div className="mb-4">
             <div className="w-full flex items-center justify-between">
+              <RouterBackButton />
               <h1 className="justify-start text-start text-gray-700 font-bold pb-3 text-3xl">Sócios</h1>
 
               <HelperDialog title="Lista de Sócios">
