@@ -1,6 +1,6 @@
 "use server"
 
-import { ClientSchema } from "@/lib/schemas/client";
+import { ClientSchema, UpdateClientSchema } from "@/lib/schemas/client";
 import { z } from "zod";
 import prisma from "@/lib/db";
 import { redirect } from "next/navigation";
@@ -56,9 +56,10 @@ export async function getAllClients() {
 
     if (role !== "admin") {
         whereCondition = {
+            ativo: true,
             id_user: {
                 equals: userId
-            }
+            },
         }
     }
 
@@ -75,6 +76,13 @@ export async function getClientById(clientId: string) {
     const client = await prisma.cliente.findUnique({
         where: {
             id_cliente: clientId
+        },
+        include: {
+            user: {
+                select: {
+                    nome: true
+                }
+            }
         }
     })
 
@@ -85,6 +93,8 @@ export async function getClientById(clientId: string) {
 
     return client;
 }
+export type TClientById = Awaited<ReturnType<typeof getClientById>>;
+
 export async function updateClient(id: string, values: z.infer<typeof ClientSchema>) {
     // Acha o cliente pelo ID
     const client = await prisma.cliente.findUnique({
@@ -122,11 +132,23 @@ export async function updateClient(id: string, values: z.infer<typeof ClientSche
     return updatedClient;
 }
 
-export async function updateClientById(clientId: string, values: z.infer<typeof ClientSchema>) {
-    // Verifica se o cliente existe pelo ID
+export async function updateClientById(clientId: string, values: z.infer<typeof UpdateClientSchema>) {
+    console.log("uiuiui")
+
+    const { success, error, data } = UpdateClientSchema.safeParse(values)
+
+    if (!success) {
+        return JSON.stringify({ error })
+    }
+
+    console.log({ data })
+
     const existingClient = await prisma.cliente.findUnique({
         where: {
             id_cliente: clientId
+        },
+        select: {
+            id_cliente: true
         }
     });
 
@@ -137,7 +159,15 @@ export async function updateClientById(clientId: string, values: z.infer<typeof 
     // Atualiza os dados no banco
     const updatedClient = await prisma.cliente.update({
         where: { id_cliente: clientId },
-        data: values,
+        data: {
+            dupla_nacio: values.dualNationality,
+            email: values.email,
+            est_civil: values.maritalStatus,
+            id_user: values.partnerId,
+            profissao: values.profession,
+            reg_bens: values.propertyRegime,
+            res_fiscal_brasil: values.taxResidenceInBrazil
+        }
     });
 
     console.log({ values, updateClient })
@@ -228,4 +258,60 @@ export async function activateClient(clientId: string) {
 
     // Redireciona para a página de clientes
     return updatedClient;
+}
+
+
+
+export async function getClientNameById(clientId: string) {
+    const client = await prisma.cliente.findUnique({
+        where: {
+            id_cliente: clientId
+        }
+    })
+
+    // VERIFICA SE EXISTE
+    if (!client) {
+        throw new Error("Usuário não encontrado");
+    }
+
+    return client.nome;
+}
+
+export async function getClientsByPartner(partnerId: string) {
+    if (!partnerId) {
+        throw new Error("O ID do sócio é obrigatório.");
+    }
+
+    // Verifica o papel do usuário que está fazendo a solicitação
+    const role = await GetUserRole();
+    const userId = await GetUserId();
+
+    // Se o usuário não for admin e tentar acessar um sócio que não é ele mesmo, bloqueia a ação
+    if (role !== "admin" && userId !== partnerId) {
+        throw new Error("Permissão negada.");
+    }
+
+    // Busca todos os clientes associados ao 'partnerId' fornecido
+    const clients = await prisma.cliente.findMany({
+        where: {
+            id_user: partnerId,
+            ativo: true,
+        },
+        select: {
+            id_cliente: true,
+            nome: true,
+            cpf: true,
+            email: true,
+            profissao: true,
+            data_nasc: true,
+            est_civil: true,
+        },
+    });
+
+    // Verifica se foram encontrados clientes
+    if (clients.length === 0) {
+        console.log("Nenhum cliente encontrado para este sócio.");
+    }
+
+    return clients;
 }

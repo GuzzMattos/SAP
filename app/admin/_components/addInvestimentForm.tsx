@@ -19,6 +19,10 @@ import { TIndice } from "@/app/_actions/indice";
 import CurrencyInput, { CurrencyInputProps, CurrencyInputOnChangeValues } from 'react-currency-input-field';
 import jQuery from "jquery";
 import HelperDialog from "@/components/helper-dialog";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import RouterBackButton from "@/components/router-back-button";
 
 
 
@@ -69,12 +73,59 @@ export default function InvestimentForm({ clientId, indice }: IInvestimentForm) 
         <main className="bg-gray-50 min-h-screen p-6 flex justify-center items-center">
             <div className="bg-white p-8 shadow-md rounded-lg w-full max-w-2xl">
                 <div className="flex items-center justify-between mb-4">
+                    <RouterBackButton />
                     <div className="text-gray-700 font-bold pb-3 text-3xl">Adicionar Investimento</div>
 
-                    <HelperDialog title='Ajuda'>
+                    <HelperDialog title='Adicionar Investimento'>
+
+                        {/* Conteúdo da ajuda aqui */}
                         <div>
-                            {/* Conteúdo da ajuda aqui */}
-                            Selecione o banco com o qual deseja realizar as operações. Certifique-se de que o banco desejado está na lista antes de prosseguir.
+                            <div>
+                                <p><strong>Banco</strong> (Obrigatório): Selecione o banco responsável pelo investimento a partir da lista de opções disponíveis.</p>
+                            </div>
+                            <div>
+                                <p><strong>Agência</strong> (Obrigatório): Informe o número da agência bancária onde o investimento está registrado.</p>
+                            </div>
+                            <div>
+                                <p><strong>Conta</strong> (Obrigatório): Insira o número da conta onde o investimento será associado.</p>
+                            </div>
+                            <div>
+                                <p><strong>Classe</strong> (Obrigatório): Escolha a classe do investimento.</p>
+                                <div>
+                                    <p><strong>Subclasse</strong> (Obrigatório): Selecione uma subclasse que especifica o tipo de investimento dentro da classe selecionada.</p>
+                                </div>
+                                <div>
+                                    <p><strong>Setor de Atividade</strong> (Obrigatório): Descreva o setor de atividade que se relaciona com o investimento, como setor financeiro, industrial, ou de tecnologia.</p>
+                                </div>
+                                <div>
+                                    <p><strong>Liquidez</strong> (Obrigatório): Informe a liquidez do investimento, que representa a facilidade de converter o ativo em dinheiro. Por exemplo, se o investimento possui liquidez diária ou mensal.</p>
+                                </div>
+                                <div>
+                                    <p><strong>Data da Aplicação</strong> (Obrigatório): Insira a data em que o investimento foi realizado. Utilize o formato de data padrão (DD/MM/AAAA).</p>
+                                </div>
+                                <div>
+                                    <p><strong>Data do Vencimento</strong> (Obrigatório): Informe a data de vencimento do investimento, ou seja, quando ele será finalizado ou resgatado.</p>
+                                </div>
+                                <div>
+                                    <p><strong>Índice</strong> (Opcional): Selecione um índice de referência para o investimento, como o CDI, IPCA, ou outro, caso o rendimento esteja atrelado a algum índice econômico.</p>
+                                </div>
+                                <div>
+                                    <p><strong>Porcentagem do Índice</strong> e <strong>Pré-Fixado</strong> (Opcional): Defina a porcentagem do índice escolhido que será aplicada ao rendimento do investimento. Se for um investimento pré-fixado, indique a taxa fixa aplicável.</p>
+                                </div>
+                                <div>
+                                    <p><strong>Isento</strong> (Obrigatório): Escolha se o investimento é isento de impostos. Marque "Sim" ou "Não" conforme a situação fiscal.</p>
+                                </div>
+                                <div>
+                                    <p><strong>País</strong> (Obrigatório): Selecione o país onde o investimento está localizado ou registrado.</p>
+                                </div>
+                                <div>
+                                    <p><strong>Valor</strong> (Obrigatório): Insira o valor do investimento. Esse é o valor total aplicado.</p>
+                                </div>
+                                <div>
+                                    <p><strong>Nota:</strong> Os campos marcados com "*" são obrigatórios.</p>
+                                </div>
+                            </div>
+
                         </div>
                     </HelperDialog>
                 </div>
@@ -153,7 +204,7 @@ export default function InvestimentForm({ clientId, indice }: IInvestimentForm) 
                             name="classe"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-gray-800">Classe</FormLabel>
+                                    <FormLabel className="text-gray-800 flex">Classe<div className="text-red-600">*</div></FormLabel>
                                     <FormControl>
                                         <select
                                             className="bg-gray-100 text-gray-800 text-sm border border-gray-300 rounded-md p-2 w-full mt-1"
@@ -177,7 +228,7 @@ export default function InvestimentForm({ clientId, indice }: IInvestimentForm) 
                             name="sub_classe_atv"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-gray-800">Subclasse</FormLabel>
+                                    <FormLabel className="text-gray-800 flex">Subclasse<div className="text-red-600">*</div></FormLabel>
                                     <FormControl>
                                         <select
                                             className="bg-gray-100 text-gray-800 text-sm border border-gray-300 rounded-md p-2 w-full mt-1"
@@ -210,7 +261,7 @@ export default function InvestimentForm({ clientId, indice }: IInvestimentForm) 
                             name="setor_ativ"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-gray-800">Setor de Atividade</FormLabel>
+                                    <FormLabel className="text-gray-800 flex">Setor de Atividade<div className="text-red-600">*</div></FormLabel>
                                     <FormControl>
                                         <Input
                                             placeholder="Setor de Atividade"
@@ -228,7 +279,7 @@ export default function InvestimentForm({ clientId, indice }: IInvestimentForm) 
                             name="liquidez"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-gray-800">Liquidez</FormLabel>
+                                    <FormLabel className="text-gray-800 flex">Liquidez<div className="text-red-600">*</div></FormLabel>
                                     <FormControl>
                                         <Input
                                             placeholder="Liquidez"
@@ -256,7 +307,7 @@ export default function InvestimentForm({ clientId, indice }: IInvestimentForm) 
 
                                 return (
                                     <FormItem>
-                                        <FormLabel className="text-gray-800">Data da Aplicação</FormLabel>
+                                        <FormLabel className="text-gray-800 flex">Data da Aplicação<div className="text-red-600">*</div></FormLabel>
                                         <FormControl>
                                             <InputMask
                                                 mask="99/99/9999"
@@ -296,7 +347,7 @@ export default function InvestimentForm({ clientId, indice }: IInvestimentForm) 
 
                                 return (
                                     <FormItem>
-                                        <FormLabel className="text-gray-800">Data do Vencimento</FormLabel>
+                                        <FormLabel className="text-gray-800 flex">Data do Vencimento<div className="text-red-600">*</div></FormLabel>
                                         <FormControl>
                                             <InputMask
                                                 mask="99/99/9999"
@@ -326,7 +377,7 @@ export default function InvestimentForm({ clientId, indice }: IInvestimentForm) 
                             name="id_indice" // Alterado para id_indice
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-gray-800">Índice</FormLabel>
+                                    <FormLabel className="text-gray-800 flex">Índice<div className="text-red-600">*</div></FormLabel>
                                     <FormControl>
                                         <select
                                             className="bg-gray-100 text-gray-800 text-sm border border-gray-300 rounded-md p-2 w-full mt-1"
@@ -352,13 +403,13 @@ export default function InvestimentForm({ clientId, indice }: IInvestimentForm) 
                                 </FormItem>
                             )}
                         />
-                        <div className="flex space-x-4"> {/* Flex container com espaço entre os inputs */}
+                        <div className="flex space-x-20"> {/* Flex container com espaço entre os inputs */}
                             <FormField
                                 control={form.control}
                                 name="porc_indice"
                                 render={({ field }) => (
                                     <FormItem className="w-1/6"> {/* Ajuste a largura do FormItem */}
-                                        <FormLabel className="text-gray-800">Porcentagem do Índice</FormLabel>
+                                        <FormLabel className="text-gray-800 flex whitespace-nowrap">Porcentagem do Índice<div className="text-red-600">*</div></FormLabel>
                                         <FormControl>
                                             <div className="flex items-center">
                                                 <Input
@@ -382,7 +433,7 @@ export default function InvestimentForm({ clientId, indice }: IInvestimentForm) 
                                 name="pre_fixado"
                                 render={({ field }) => (
                                     <FormItem className="w-1/6"> {/* Ajuste a largura do FormItem */}
-                                        <FormLabel className="text-gray-800">Pré-Fixado</FormLabel>
+                                        <FormLabel className="text-gray-800 flex">Pré-Fixado<div className="text-red-600">*</div></FormLabel>
                                         <FormControl>
                                             <div className="flex items-center">
                                                 <Input
@@ -407,7 +458,7 @@ export default function InvestimentForm({ clientId, indice }: IInvestimentForm) 
                             name="isento"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-gray-800">Isento</FormLabel>
+                                    <FormLabel className="text-gray-800 flex">Isento<div className="text-red-600">*</div></FormLabel>
                                     <FormControl>
                                         <div className="flex items-center gap-4">
                                             <Checkbox
@@ -434,7 +485,7 @@ export default function InvestimentForm({ clientId, indice }: IInvestimentForm) 
                             name="pais"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-gray-800">País</FormLabel>
+                                    <FormLabel className="text-gray-800 flex">País<div className="text-red-600">*</div></FormLabel>
                                     <FormControl>
                                         <select
                                             className="bg-gray-100 text-gray-800 text-sm border border-gray-300 rounded-md p-2 w-full mt-1"
@@ -461,7 +512,7 @@ export default function InvestimentForm({ clientId, indice }: IInvestimentForm) 
                             name="valor"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-gray-800">Valor</FormLabel>
+                                    <FormLabel className="text-gray-800 flex">Valor<div className="text-red-600">*</div></FormLabel>
                                     <FormControl>
                                         <Input
                                             type="number"

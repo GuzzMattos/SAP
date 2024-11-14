@@ -13,10 +13,22 @@ type TLink = {
 
 const adminLinks: TLink[] = [
   {
-    title: 'Dashboard',
+    title: 'Dashboard Clientes',
     url: '/admin/dashboard',
     icon: <ChartLine />,
     allowedRoles: ['admin', 'user']
+  },
+  {
+    title: 'Dashboard Steigen',
+    url: '/admin/dashboardsteigen',
+    icon: <ChartLine />,
+    allowedRoles: ['admin']
+  },
+  {
+    title: 'Dashboard Sócios',
+    url: '/admin/dashboardsocios',
+    icon: <ChartLine />,
+    allowedRoles: ['admin']
   },
   {
     title: 'Clientes',

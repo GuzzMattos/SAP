@@ -11,7 +11,7 @@ export const InvestimentSchema = z.object({
     liquidez: z.string().min(1, { message: "Liquidez é obrigatória" }).max(20, { message: "Liquidez deve ter no máximo 20 caracteres" }),
     data_aplic: z.date(),
     data_venc: z.date(),
-    id_indice: z.string().uuid(), // Mudança feita aqui
+    id_indice: z.string().uuid(),
     porc_indice: z.number().min(0, { message: "Porcentagem do Índice deve ser um número positivo" }),
     pre_fixado: z.number().min(0, { message: "Pré-Fixado deve ser um número positivo" }),
     isento: z.boolean(),

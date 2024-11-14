@@ -43,7 +43,8 @@ export default function PartnersPage() {
   const filteredPartners = partners.filter(partner =>
     partner.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
     partner.cpf.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  ).sort((a, b) => a.nome.localeCompare(b.nome));
+
   const sortedPartners = filteredPartners.sort((a, b) => a.nome.localeCompare(b.nome));
   const indexOfLastPartner = currentPage * partnersPerPage;
   const indexOfFirstPartner = indexOfLastPartner - partnersPerPage;
@@ -82,9 +83,34 @@ export default function PartnersPage() {
             <div className="w-full flex items-center justify-between">
               <h1 className="justify-start text-start text-gray-700 font-bold pb-3 text-3xl">Sócios</h1>
 
-              <HelperDialog title="SÓCIOS">
+              <HelperDialog title="Lista de Sócios">
                 <div>
-                  Página dedicada ao gereciamento de Sócios.
+                  <div>
+
+                    <div>
+                      <p><strong>Buscar por nome ou CPF</strong>: Utilize este campo para buscar sócios já cadastrados pelo nome ou número de CPF. Digite parte do nome ou do CPF completo para que o sistema exiba resultados correspondentes.</p>
+                    </div>
+
+                    <div>
+                      <p><strong>Nome</strong>: Coluna que exibe o nome dos sócios cadastrados.</p>
+                    </div>
+
+                    <div>
+                      <p><strong>CPF</strong>: Coluna que mostra o CPF dos sócios cadastrados, permitindo uma identificação única de cada pessoa.</p>
+                    </div>
+
+                    <div>
+                      <p><strong>Ações</strong>: Coluna onde são disponibilizadas as ações que podem ser realizadas com o sócio listado. Os ícones de edição e exclusão permitem atualizar ou remover o registro do sócio.</p>
+                    </div>
+
+                    <div>
+                      <p><strong>Botão "Adicionar Novo"</strong>: Clique neste botão para adicionar um novo sócio. Você será redirecionado para uma página de cadastro onde poderá inserir todas as informações necessárias.</p>
+                    </div>
+                    <div>
+                      <p><strong>Botões "Anterior e Próxima"</strong>: Estes dois botões permitem que você navague pelas páginas da lista de sócios cadastrados.</p>
+                    </div>
+                  </div>
+
                 </div>
               </HelperDialog>
             </div>

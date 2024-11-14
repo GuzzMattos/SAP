@@ -54,10 +54,12 @@ export default function ClientsPage() {
     };
 
     // Filtrar clientes com base no termo de pesquisa
-    const filteredClients = clients.filter(client =>
-        client.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        client.cpf.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredClients = clients
+        .filter(client =>
+            client.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            client.cpf.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        .sort((a, b) => a.nome.localeCompare(b.nome));
 
     // Determinar os clientes a serem exibidos na página atual
     const indexOfLastClient = currentPage * clientsPerPage;
@@ -92,9 +94,46 @@ export default function ClientsPage() {
                     <h1 className="text-gray-700 font-bold text-3xl">Clientes Ativos</h1>
 
                     {/* HelperDialog no canto superior direito */}
-                    <HelperDialog title="Ajuda">
+                    <HelperDialog title="Lista de Clientes Ativos">
                         <div>
-                            Aqui você pode gerenciar seus clientes. Utilize o campo de busca para filtrar por nome ou CPF.
+                            <div>
+
+                                <div>
+                                    <p><strong>Buscar por nome ou CPF</strong>: Utilize este campo para buscar clientes ativos cadastrados pelo nome ou número de CPF. Digite parte do nome ou do CPF completo para que o sistema exiba resultados correspondentes.</p>
+                                </div>
+
+                                <div>
+                                    <p><strong>Nome</strong>: Coluna que exibe o nome dos clientes ativos cadastrados.</p>
+                                </div>
+
+                                <div>
+                                    <p><strong>CPF</strong>: Coluna que mostra o CPF dos clientes ativos cadastrados, permitindo uma identificação única de cada pessoa.</p>
+                                </div>
+
+                                <div>
+                                    <p><strong>Ações</strong>: Coluna onde são disponibilizadas as ações que podem ser realizadas com o cliente listado. Os ícones de edição e exclusão permitem atualizar ou remover o registro do cliente.</p>
+                                </div>
+
+                                <div>
+                                    <p><strong>Botão "Clientes Inativos"</strong>: Clique neste botão para alternar a visualização para a lista de clientes inativos.</p>
+                                </div>
+
+                                <div>
+                                    <p><strong>Botão "Adicionar Novo"</strong>: Clique neste botão para adicionar um novo cliente ativo. Você será redirecionado para uma página de cadastro onde poderá inserir todas as informações necessárias.</p>
+                                </div>
+
+                                <div>
+                                    <p><strong>Botão "Anterior"</strong>: Use este botão para navegar para a página anterior na lista de clientes ativos, caso haja vários registros.</p>
+                                </div>
+
+                                <div>
+                                    <p><strong>Botão "Próxima"</strong>: Use este botão para avançar para a próxima página na lista de clientes ativos, caso haja muitos registros.</p>
+                                </div>
+                                <div>
+                                    <p><strong>Botões "Anterior e Próxima"</strong>: Estes dois botões permitem que você navague pelas páginas da lista de clientes ativos.</p>
+                                </div>
+                            </div>
+
                         </div>
                     </HelperDialog>
                 </div>

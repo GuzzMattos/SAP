@@ -2,41 +2,39 @@
 
 import { useState, useEffect } from 'react';
 import Link from "next/link";
-import { EditIcon, Eye, TrashIcon } from "lucide-react";
+import { ArrowBigUp, EditIcon, Eye, TrashIcon } from "lucide-react";
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
-import { getInvestimentsByClientId, getInvestimentById, TInvestimentsByClientId, TInvestimentById, deactivateInvestiment } from "@/app/_actions/investiment";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { getInactiveInvestimentsByClientId, getInactiveInvestimentById, TInvestimentsByClientId, TInvestimentByIdInactive, activateInvestiment } from "@/app/_actions/investiment";
 
 interface IInvestmentsPage {
     clientId: string;
 }
 
-export default function InvestmentsPage({ clientId }: IInvestmentsPage) {
+export default function InvestmentsInactivePage({ clientId }: IInvestmentsPage) {
     const [investments, setInvestments] = useState<TInvestimentsByClientId>([]);
-    const [selectedInvestment, setSelectedInvestment] = useState<TInvestimentById | null>(null);
+    const [selectedInvestment, setSelectedInvestment] = useState<TInvestimentByIdInactive | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedInvestmentId, setSelectedInvestmentId] = useState<string | null>(null);
-    const [dialogOpen, setDialogOpen] = useState(false);
-    const investmentsPerPage = 10;
 
-    const confirmDeleteInvestment = async () => {
+    const investmentsPerPage = 10;
+    const confirmActivateInvest = async () => {
+        console.log(selectedInvestmentId)
         if (selectedInvestmentId) {
             try {
-                await deactivateInvestiment(selectedInvestmentId);
+                await activateInvestiment(selectedInvestmentId);
                 setSelectedInvestmentId(null)
-                setDialogOpen(false);;
             } catch (error: any) {
                 console.log(error.message);  // Captura a mensagem de erro para exibição
             }
         }
     };
-
     useEffect(() => {
         const fetchInvestments = async () => {
             try {
-                const response = await getInvestimentsByClientId(clientId);
+                const response = await getInactiveInvestimentsByClientId(clientId);
                 setInvestments(response);
             } catch (error) {
                 console.error("Failed to fetch investments", error);
@@ -48,7 +46,7 @@ export default function InvestmentsPage({ clientId }: IInvestmentsPage) {
 
     const handleViewInvestment = async (investmentId: string) => {
         try {
-            const investment = await getInvestimentById(investmentId);
+            const investment = await getInactiveInvestimentById(investmentId);
             setSelectedInvestment(investment);
             setIsDialogOpen(true);
         } catch (error) {
@@ -122,35 +120,17 @@ export default function InvestmentsPage({ clientId }: IInvestmentsPage) {
                                 >
                                     <Eye className="w-5 h-5 text-gray-600" />
                                 </button>
-                                <Dialog open={dialogOpen} key={investment.id_invest} onOpenChange={setDialogOpen}>
-                                    <DialogTrigger asChild>
-                                        <button
-                                            key={investment.id_invest}
-                                            aria-label="Delete"
-                                            className="p-1 rounded hover:bg-gray-200"
-                                            onClick={() => {
-                                                setSelectedInvestmentId(investment.id_invest);
-                                                setDialogOpen(true); // Abre o diálogo quando clica em deletar
-                                            }}
-                                        >
-                                            <TrashIcon className="w-5 h-5 text-red-600" />
-                                        </button>
-                                    </DialogTrigger>
-                                    <DialogContent>
-                                        <DialogTitle>Confirmar Exclusão</DialogTitle>
-                                        <DialogDescription>
-                                            Tem certeza de que deseja excluir o investimento?
-                                        </DialogDescription>
-                                        <DialogFooter>
-                                            <Button variant="outline" onClick={() => setDialogOpen(false)}>
-                                                Cancelar
-                                            </Button>
-                                            <Button variant="destructive" onClick={confirmDeleteInvestment}>
-                                                Confirmar
-                                            </Button>
-                                        </DialogFooter>
-                                    </DialogContent>
-                                </Dialog>
+                                <button
+                                    key={investment.id_invest}
+                                    aria-label="Ativar"
+                                    className="p-1 rounded hover:bg-gray-200 mr-5"
+                                    onClick={() => {
+                                        setSelectedInvestmentId(investment.id_invest);  // Atualiza o estado com o ID do investimento selecionado
+                                        confirmActivateInvest();  // Chama a função de confirmação de ativação
+                                    }}
+                                >
+                                    <ArrowBigUp className="w-5 h-5 text-green-600" />
+                                </button>
                             </div>
                         </div>
                     ))}
@@ -161,11 +141,6 @@ export default function InvestmentsPage({ clientId }: IInvestmentsPage) {
                     <Button onClick={handlePreviousPage} disabled={currentPage === 1} variant="outline">
                         Anterior
                     </Button>
-                    <Link href={`/admin/clients/${clientId}/addInvestiment`}>
-                        <Button variant="outline">
-                            Adicionar Investimento
-                        </Button>
-                    </Link>
                     <Button onClick={handleNextPage} disabled={currentPage === totalPages} variant="outline">
                         Próximo
                     </Button>

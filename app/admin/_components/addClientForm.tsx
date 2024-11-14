@@ -25,6 +25,7 @@ import { createClient } from "@/app/_actions/client";
 import { parse, isValid, format } from "date-fns";
 import { TPartner } from "@/app/_actions/partner";
 import HelperDialog from "@/components/helper-dialog";
+import RouterBackButton from "@/components/router-back-button";
 
 interface IClientForm {
     partners: TPartner;
@@ -72,13 +73,51 @@ export default function AddClientForm({ partners }: IClientForm) {
             <div className="max-w-2xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
                 <div className="p-4 border-b border-gray-200">
                     <div className="flex items-center justify-between">
+                        <RouterBackButton />
                         <h1 className="text-gray-700 font-bold text-3xl">Adicionar Cliente</h1>
 
-                        <HelperDialog title='Ajuda'>
+                        <HelperDialog title='Adicionar Clientes'>
                             <div>
                                 {/* Conteúdo da ajuda aqui */}
-                                daskjdaksldjaksl
-                                <span>k COLMANZERA</span>
+                                <div>
+
+                                    <div>
+                                        <p><strong>Nome</strong>: Campo obrigatório. Insira o nome completo do cliente.</p>
+                                    </div>
+
+                                    <div>
+                                        <p><strong>Email</strong>: Campo obrigatório. Insira o endereço de e-mail do cliente. Certifique-se de que o e-mail está correto para possibilitar o contato.</p>
+                                    </div>
+
+                                    <div>
+                                        <p><strong>CPF</strong>: Campo obrigatório. Insira o número do CPF do cliente. O CPF deve ser válido e não pode conter caracteres especiais (apenas números).</p>
+                                    </div>
+
+                                    <div>
+                                        <p><strong>Data de Nascimento</strong>: Campo obrigatório. Insira a data de nascimento do cliente no formato DD/MM/AAAA.</p>
+                                    </div>
+
+                                    <div>
+                                        <p><strong>Estado Civil</strong>: Selecione o estado civil do cliente a partir das opções disponíveis (por exemplo, Solteiro, Casado, Divorciado, etc.).</p>
+                                    </div>
+
+                                    <div>
+                                        <p><strong>Dupla Nacionalidade</strong>: Selecione "Sim" se o cliente possuir dupla nacionalidade, ou "Não" caso contrário. Esta escolha ajudará no preenchimento de informações adicionais de nacionalidade, caso necessário.</p>
+                                    </div>
+
+                                    <div>
+                                        <p><strong>Residência Fiscal no Brasil</strong>: Selecione "Sim" se o cliente possui residência fiscal no Brasil, ou "Não" se for residente fiscal em outro país.</p>
+                                    </div>
+
+                                    <div>
+                                        <p><strong>Profissão</strong>: Selecione a profissão do cliente a partir das opções disponíveis. Esse campo ajuda a definir o perfil de ocupação do cliente.</p>
+                                    </div>
+
+                                    <div>
+                                        <p><strong>Sócio</strong>: Selecione o sócio que vai gerenciar o perfil deste cliente.</p>
+                                    </div>
+                                </div>
+
                             </div>
                         </HelperDialog>
                     </div>
@@ -91,7 +130,7 @@ export default function AddClientForm({ partners }: IClientForm) {
                             name="name"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-gray-800">Nome</FormLabel>
+                                    <FormLabel className="text-gray-800 flex">Nome<div className="text-red-600">*</div></FormLabel>
                                     <FormControl>
                                         <Input
                                             placeholder="Nome"
@@ -108,7 +147,7 @@ export default function AddClientForm({ partners }: IClientForm) {
                             name="email"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-gray-800">Email</FormLabel>
+                                    <FormLabel className="text-gray-800 flex">Email<div className="text-red-600">*</div></FormLabel>
                                     <FormControl>
                                         <Input
                                             type="email"
@@ -128,7 +167,7 @@ export default function AddClientForm({ partners }: IClientForm) {
                                 name="cpf"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-gray-800">CPF</FormLabel>
+                                        <FormLabel className="text-gray-800 flex">CPF<div className="text-red-600">*</div></FormLabel>
                                         <FormControl>
                                             <InputMask
                                                 mask="999.999.999-99"
@@ -149,7 +188,7 @@ export default function AddClientForm({ partners }: IClientForm) {
                                 name="birthDate"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-gray-800">Data de Nascimento</FormLabel>
+                                        <FormLabel className="text-gray-800 flex">Data de Nascimento<div className="text-red-600">*</div></FormLabel>
                                         <FormControl>
                                             <Input
                                                 className="bg-gray-100 text-gray-800 border border-gray-300 rounded-md p-2 w-full mt-1"
@@ -177,7 +216,7 @@ export default function AddClientForm({ partners }: IClientForm) {
                                 name="maritalStatus"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-gray-800">Estado Civil</FormLabel>
+                                        <FormLabel className="text-gray-800 flex">Estado Civil<div className="text-red-600">*</div></FormLabel>
                                         <FormControl>
                                             <select
                                                 className="bg-gray-100 text-gray-800 text-sm border border-gray-300 rounded-md p-2 w-full mt-1"
@@ -201,7 +240,7 @@ export default function AddClientForm({ partners }: IClientForm) {
                                     name="propertyRegime"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-gray-800">Regime de Bens</FormLabel>
+                                            <FormLabel className="text-gray-800 flex">Regime de Bens<div className="text-red-600">*</div></FormLabel>
                                             <FormControl>
                                                 <select
                                                     className="bg-gray-100 text-gray-800 text-sm border border-gray-300 rounded-md p-2 w-full mt-1"
@@ -227,7 +266,7 @@ export default function AddClientForm({ partners }: IClientForm) {
                             name="dualNationality"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-gray-800">Dupla Nacionalidade</FormLabel>
+                                    <FormLabel className="text-gray-800 flex">Dupla Nacionalidade<div className="text-red-600">*</div></FormLabel>
                                     <FormControl>
                                         <div className="flex items-center gap-4">
                                             <Checkbox
@@ -254,7 +293,7 @@ export default function AddClientForm({ partners }: IClientForm) {
                             name="taxResidenceInBrazil"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-gray-800">Residência Fiscal no Brasil</FormLabel>
+                                    <FormLabel className="text-gray-800 flex">Residência Fiscal no Brasil<div className="text-red-600">*</div></FormLabel>
                                     <FormControl>
                                         <div className="flex items-center gap-4">
                                             <Checkbox
@@ -281,7 +320,7 @@ export default function AddClientForm({ partners }: IClientForm) {
                             name="profession"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-gray-800">Profissão</FormLabel>
+                                    <FormLabel className="text-gray-800 flex">Profissão<div className="text-red-600">*</div></FormLabel>
                                     <FormControl>
                                         <select
                                             className="bg-gray-100 text-gray-800 text-sm border border-gray-300 rounded-md p-2 w-full mt-1"
@@ -308,7 +347,7 @@ export default function AddClientForm({ partners }: IClientForm) {
                             name="partnerId"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-gray-800">Sócio</FormLabel>
+                                    <FormLabel className="text-gray-800 flex">Sócio<div className="text-red-600">*</div></FormLabel>
                                     <FormControl>
                                         <select
                                             className="bg-gray-100 text-gray-800 text-sm border border-gray-300 rounded-md p-2 w-full mt-1"

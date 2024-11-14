@@ -1,6 +1,6 @@
 "use server";
 
-import { FamiliarSchema } from "@/lib/schemas/familiar";
+import { FamiliarSchema, UpdateFamiliarSchema } from "@/lib/schemas/familiar";
 import { z } from "zod";
 import prisma from "@/lib/db";
 import { redirect } from "next/navigation";
@@ -65,3 +65,67 @@ export async function getFamiliarsByClientId(clientId: string) {
     return familiars;
 }
 export type TFamiliarsByClientId = Awaited<ReturnType<typeof getFamiliarsByClientId>>;
+
+
+export async function deleteFamiliar(familiarId: string) {
+    const user = await prisma.familiar.findUnique({
+        where: {
+            id_familiar: familiarId
+        }
+    });
+
+    if (!user) {
+        throw new Error("Familiar não encontrado");
+    }
+    else {
+        await prisma.familiar.delete({
+            where: {
+                id_familiar: familiarId
+            }
+        });
+        console.log("Familiar deleted");
+    }
+    return true;
+}
+
+// Function to get a familiar by their ID
+export async function getFamiliarById(familiarId: string) {
+    const familiar = await prisma.familiar.findUnique({
+        where: {
+            id_familiar: familiarId
+        }
+    });
+
+    if (!familiar) {
+        throw new Error("Familiar not found");
+    }
+
+    return familiar;
+}
+export type TFamiliarById = Awaited<ReturnType<typeof getFamiliarById>>;
+
+export async function updateFamiliar(familiarId: string, values: z.infer<typeof UpdateFamiliarSchema>) {
+    const familiarExists = await prisma.familiar.findUnique({
+        where: {
+            id_familiar: familiarId
+        }
+    });
+
+    if (!familiarExists) {
+        throw new Error("Familiar not found");
+    }
+
+    const updatedFamiliar = await prisma.familiar.update({
+        where: {
+            id_familiar: familiarId
+        },
+        data: {
+            est_civil: values.est_civil,
+            vivo: values.vivo,
+            nome_conj: values.nome_conj,
+        }
+    });
+
+    console.log("Familiar updated successfully:", updatedFamiliar);
+    return updatedFamiliar;
+}

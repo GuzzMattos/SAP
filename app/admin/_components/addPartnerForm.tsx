@@ -18,6 +18,7 @@ import { createPartner } from "@/app/_actions/partner"
 import { useState } from "react";
 import InputMask from 'react-input-mask';
 import HelperDialog from "@/components/helper-dialog";
+import RouterBackButton from "@/components/router-back-button";
 
 export default function PartnerForm() {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -60,6 +61,7 @@ export default function PartnerForm() {
         <main className="bg-gray-50 min-h-screen p-6 flex justify-center items-center">
             <div className="bg-white p-8 shadow-md rounded-lg w-full max-w-2xl">
                 <div className="flex items-center justify-between mb-4">
+                    <RouterBackButton />
                     <div className="text-gray-700 font-bold pb-3 text-3xl">Adicionar Sócio</div>
 
                     <HelperDialog title='Ajuda'>

@@ -221,19 +221,19 @@ export default function DashboardPage() {
       </div>
 
       <div className="flex gap-8 w-full mt-8">
-        {selectedClient && (
-          <div className="bg-white rounded-lg shadow-md p-10 flex-1 min-w-[300px] text-center">
-            <h2 className="text-gray-500 mb-2">Investimentos</h2>
-            <h3 className="text-black text-2xl font-bold mb-4">Valuation</h3>
-            <p className="text-blue-500 text-3xl font-semibold">R${totalInvestimentos.toFixed(2)}</p>
-            <p className="text-gray-500 mt-4">dividido em</p>
-            <p className="text-blue-500 text-3xl font-semibold">{numInvestimentos}</p>
-            <p className="text-gray-500">aplicações</p>
-          </div>
-        )}
+
+        <div className="bg-white rounded-lg shadow-md p-10 flex-1 min-w-[300px] text-center">
+          <h2 className="text-gray-500 mb-2">Investimentos</h2>
+          <h3 className="text-black text-2xl font-bold mb-4">Valuation</h3>
+          <p className="text-blue-500 text-3xl font-semibold">R${totalInvestimentos.toFixed(2)}</p>
+          <p className="text-gray-500 mt-4">dividido em</p>
+          <p className="text-blue-500 text-3xl font-semibold">{numInvestimentos}</p>
+          <p className="text-gray-500">aplicações</p>
+        </div>
+
 
         {/* Novo quadro como placeholder */}
-        <div className="bg-gray-200 rounded-lg shadow-md p-10 flex-1 min-w-[300px] text-center">
+        <div className="bg-white rounded-lg shadow-md p-10 flex-1 min-w-[300px] text-center">
           <div className="flex justify-between mb-4">
             <div>
               <p className="text-gray-500">Rentabilidade Bruta</p>

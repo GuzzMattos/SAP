@@ -18,3 +18,16 @@ export const FamiliarSchema = z.object({
 });
 
 export type TFamiliarSchema = z.infer<typeof FamiliarSchema>;
+
+export const UpdateFamiliarSchema = z.object({
+    cpf: z.string().length(14, { message: "CPF inválido" }).optional(),
+    est_civil: z.enum(["Solteiro", "Casado", "Divorciado", "Viúvo"], { message: "Estado civil é obrigatório" }).optional(), // Estado civil é obrigatório e deve estar dentro das opções fornecidas
+    nome: z.string()
+        .min(1, { message: "Nome é obrigatório" })
+        .max(102, { message: "Nome deve ter no máximo 102 caracteres" })
+        .refine(value => /\s/.test(value), { message: "Deve conter nome e sobrenome" }).optional(),
+    data_nasc: z.date().optional(), // Verifica se a data de nascimento é válida
+    vivo: z.boolean().optional(), // A informação se o familiar está vivo ou não é obrigatória
+    nome_conj: z.string().optional().optional(), // Nome do cônjuge é opcional e deve ter no máximo 102 caracteres
+    parentesco: z.string().min(1, { message: "Parentesco é obrigatório" }).max(20, { message: "Parentesco deve ter no máximo 20 caracteres" }).optional(), // O parentesco é obrigatório e deve ter no máximo 20 caracteres
+});

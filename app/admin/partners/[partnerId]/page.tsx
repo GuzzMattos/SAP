@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getPartnerById } from "@/app/_actions/partner";
 import HelperDialog from '@/components/helper-dialog';
+import ClientsPagePartner from '../../_components/clientListPartner';
 
 export default function SinglePartnerPage({ params }: { params: { partnerId: string } }) {
     const [partner, setPartner] = useState<any>(null); // Ajuste o tipo conforme o formato dos dados
@@ -46,9 +47,9 @@ export default function SinglePartnerPage({ params }: { params: { partnerId: str
                         <TabsTrigger value="Detalhes" className="py-2 px-4 text-gray-400 hover:text-blue-500 focus:outline-none focus:ring-0">
                             Detalhes
                         </TabsTrigger>
-                        {/* <TabsTrigger value="Outras Informações" className="py-2 px-4 text-gray-400 hover:text-blue-500 focus:outline-none focus:ring-0">
+                        <TabsTrigger value="Clientes" className="py-2 px-4 text-gray-400 hover:text-blue-500 focus:outline-none focus:ring-0">
                             Clientes
-                        </TabsTrigger> */}
+                        </TabsTrigger>
                     </TabsList>
 
                     {/* Tab Panels */}
@@ -77,10 +78,10 @@ export default function SinglePartnerPage({ params }: { params: { partnerId: str
                             {/* Adicione mais campos conforme necessário */}
                         </div>
                     )}
-                    {activeTab === "Outras Informações" && (
+                    {activeTab === "Clientes" && (
                         <div>
-                            {/* Conteúdo da aba Outras Informações */}
-                            <p>Conteúdo da aba Outras Informações.</p>
+                            <ClientsPagePartner partnerId={partner.id_user} />
+
                         </div>
                     )}
                 </Tabs>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from "next/link";
-import { EditIcon, TrashIcon, ArrowBigUp } from "lucide-react";
+import { EditIcon, TrashIcon } from "lucide-react";
 import { Button } from '@/components/ui/button';
 import {
     Pagination,
@@ -13,42 +13,48 @@ import {
     PaginationNext,
     PaginationPrevious
 } from "@/components/ui/pagination";
-import { activateClient, getInactiveClients, TInactiveClient } from '@/app/_actions/client';
+import { deleteClient, getAllClients, getClientsByPartner, TClient } from '@/app/_actions/client';
 import HelperDialog from '@/components/helper-dialog';
 import { DialogTrigger, Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle } from '@/components/ui/dialog';
-import { redirect } from "next/navigation";
 
-
-export default function ClientsPage() {
-    const [clients, setClients] = useState<TInactiveClient>([]);
+export default function ClientsPagePartner({ partnerId }: { partnerId: string }) {
+    const [clients, setClients] = useState<TClient>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
     const [selectedClientName, setSelectedClientName] = useState<string | null>(null);
     const [dialogOpen, setDialogOpen] = useState(false);
     const clientsPerPage = 10;
-
     useEffect(() => {
         const fetchClients = async () => {
             try {
-                const response = await getInactiveClients()
-
-                setClients(response);
+                if (partnerId) {
+                    const response = await getClientsByPartner(partnerId);
+                    const transformedClients = response.map(client => ({
+                        ...client,
+                        dupla_nacio: false,
+                        reg_bens: '',
+                        res_fiscal_brasil: false,
+                        id_user: '',
+                        ativo: true
+                    }));
+                    setClients(transformedClients);
+                }
             } catch (error) {
-                console.error("Failed to fetch clients", error);
+                console.error("Failed to fetch clients by partner", error);
             }
         };
 
         fetchClients();
-    }, [clients, setClients, selectedClientId, setSelectedClientId]);
+    }, [partnerId]);
 
-    const confirmActivateClient = async () => {
+    const confirmDeleteClient = async () => {
         if (selectedClientId) {
             try {
-                await activateClient(selectedClientId);
+                await deleteClient(selectedClientId);
                 setSelectedClientId(null)
                 setSelectedClientName(null)
-                setDialogOpen(false);
+                setDialogOpen(false);;
             } catch (error: any) {
                 console.log(error.message);  // Captura a mensagem de erro para exibição
             }
@@ -56,10 +62,12 @@ export default function ClientsPage() {
     };
 
     // Filtrar clientes com base no termo de pesquisa
-    const filteredClients = clients.filter(client =>
-        client.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        client.cpf.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredClients = clients
+        .filter(client =>
+            client.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            client.cpf.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        .sort((a, b) => a.nome.localeCompare(b.nome));
 
     // Determinar os clientes a serem exibidos na página atual
     const indexOfLastClient = currentPage * clientsPerPage;
@@ -91,47 +99,56 @@ export default function ClientsPage() {
 
                 {/* Contêiner do título e HelperDialog */}
                 <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-                    <h1 className="text-gray-700 font-bold text-3xl">Clientes Inativos</h1>
+
 
                     {/* HelperDialog no canto superior direito */}
-                    <HelperDialog title="Lista de Clientes Inativos">
+                    {/*<HelperDialog title="Lista de Clientes Ativos">
                         <div>
                             <div>
 
                                 <div>
-                                    <p><strong>Buscar por nome ou CPF</strong>: Utilize este campo para buscar clientes inativos cadastrados pelo nome ou número de CPF. Digite parte do nome ou do CPF completo para que o sistema exiba resultados correspondentes.</p>
+                                    <p><strong>Buscar por nome ou CPF</strong>: Utilize este campo para buscar clientes ativos cadastrados pelo nome ou número de CPF. Digite parte do nome ou do CPF completo para que o sistema exiba resultados correspondentes.</p>
                                 </div>
 
                                 <div>
-                                    <p><strong>Nome</strong>: Coluna que exibe o nome dos clientes inativos cadastrados.</p>
+                                    <p><strong>Nome</strong>: Coluna que exibe o nome dos clientes ativos cadastrados.</p>
                                 </div>
 
                                 <div>
-                                    <p><strong>CPF</strong>: Coluna que mostra o CPF dos clientes inativos cadastrados, permitindo uma identificação única de cada pessoa.</p>
+                                    <p><strong>CPF</strong>: Coluna que mostra o CPF dos clientes ativos cadastrados, permitindo uma identificação única de cada pessoa.</p>
                                 </div>
 
                                 <div>
-                                    <p><strong>Ações</strong>: Coluna onde são disponibilizadas as ações que podem ser realizadas com o cliente listado. O ícone verde de "reativar" permite que o cliente inativo seja reativado.</p>
+                                    <p><strong>Ações</strong>: Coluna onde são disponibilizadas as ações que podem ser realizadas com o cliente listado. Os ícones de edição e exclusão permitem atualizar ou remover o registro do cliente.</p>
                                 </div>
 
                                 <div>
-                                    <p><strong>Botão "Anterior"</strong>: Use este botão para navegar para a página anterior na lista de clientes inativos, caso haja vários registros.</p>
+                                    <p><strong>Botão "Clientes Inativos"</strong>: Clique neste botão para alternar a visualização para a lista de clientes inativos.</p>
                                 </div>
 
                                 <div>
-                                    <p><strong>Botão "Próxima"</strong>: Use este botão para avançar para a próxima página na lista de clientes inativos, caso haja muitos registros.</p>
+                                    <p><strong>Botão "Adicionar Novo"</strong>: Clique neste botão para adicionar um novo cliente ativo. Você será redirecionado para uma página de cadastro onde poderá inserir todas as informações necessárias.</p>
+                                </div>
+
+                                <div>
+                                    <p><strong>Botão "Anterior"</strong>: Use este botão para navegar para a página anterior na lista de clientes ativos, caso haja vários registros.</p>
+                                </div>
+
+                                <div>
+                                    <p><strong>Botão "Próxima"</strong>: Use este botão para avançar para a próxima página na lista de clientes ativos, caso haja muitos registros.</p>
                                 </div>
                                 <div>
-                                    <p><strong>Botões "Anterior e Próxima"</strong>: Estes dois botões permitem que você navague pelas páginas da lista de clientes inativos.</p>
+                                    <p><strong>Botões "Anterior e Próxima"</strong>: Estes dois botões permitem que você navague pelas páginas da lista de clientes ativos.</p>
                                 </div>
                             </div>
 
                         </div>
                     </HelperDialog>
+                    {/* Campo de busca */}
                 </div>
 
                 <div className="p-4 border-b border-gray-200">
-                    {/* Campo de busca */}
+
                     <input
                         type="text"
                         placeholder="Buscar por nome ou CPF"
@@ -161,32 +178,39 @@ export default function ClientsPage() {
                                 {client.cpf}
                             </div>
                             <div className="flex items-center justify-end space-x-2">
-
+                                <button
+                                    aria-label="Edit"
+                                    className="p-1 rounded hover:bg-gray-200"
+                                >
+                                    <Link href={`/admin/clients/${client.id_cliente}/editClient`} className="text-gray-600 hover:underline">
+                                        <EditIcon className="w-5 h-5 text-gray-600" />
+                                    </Link>
+                                </button>
                                 <Dialog open={dialogOpen} key={client.id_cliente} onOpenChange={setDialogOpen}>
                                     <DialogTrigger asChild>
                                         <button
                                             key={client.id_cliente}
-                                            aria-label="Ativar"
-                                            className="p-1 rounded hover:bg-gray-200 mr-5"
+                                            aria-label="Delete"
+                                            className="p-1 rounded hover:bg-gray-200"
                                             onClick={() => {
                                                 setSelectedClientId(client.id_cliente);
                                                 setSelectedClientName(client.nome)
                                                 setDialogOpen(true); // Abre o diálogo quando clica em deletar
                                             }}
                                         >
-                                            <ArrowBigUp className="w-5 h-5 text-green-600" />
+                                            <TrashIcon className="w-5 h-5 text-red-600" />
                                         </button>
                                     </DialogTrigger>
                                     <DialogContent>
-                                        <DialogTitle>Confirmar Ativação</DialogTitle>
+                                        <DialogTitle>Confirmar Exclusão</DialogTitle>
                                         <DialogDescription>
-                                            Tem certeza de que deseja ativar o cliente {selectedClientName}?
+                                            Tem certeza de que deseja excluir o cliente {selectedClientName}?
                                         </DialogDescription>
                                         <DialogFooter>
                                             <Button variant="outline" onClick={() => setDialogOpen(false)}>
                                                 Cancelar
                                             </Button>
-                                            <Button variant="destructive" onClick={confirmActivateClient}>
+                                            <Button variant="destructive" onClick={confirmDeleteClient}>
                                                 Confirmar
                                             </Button>
                                         </DialogFooter>
@@ -198,6 +222,7 @@ export default function ClientsPage() {
                 </div>
 
                 {/* Botão Adicionar Novo */}
+
 
                 {/* Paginação */}
                 <Pagination className="text-white p-2 rounded-lg">

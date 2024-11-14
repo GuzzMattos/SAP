@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getPartnerById, updatePartnerById } from "@/app/_actions/partner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import HelperDialog from '@/components/helper-dialog';
 
 
 export default function EditPartnerPage({ params }: { params: { partnerId: string } }) {
@@ -67,61 +68,87 @@ export default function EditPartnerPage({ params }: { params: { partnerId: strin
     return (
         <main className="bg-gray-50 min-h-screen p-6">
             <Card className="p-6 max-w-full mx-auto bg-white shadow-md rounded-lg">
-                <Tabs value={activeTab} onValueChange={setActiveTab}>
-                    <TabsList className="border-b border-gray-300 mb-4">
-                        <TabsTrigger value="Detalhes" className="py-2 px-4 text-gray-400 hover:text-blue-500 focus:outline-none focus:ring-0">
-                            Detalhes
-                        </TabsTrigger>
-                        {/* <TabsTrigger value="Outras Informações" className="py-2 px-4 text-gray-400 hover:text-blue-500 focus:outline-none focus:ring-0">
-                            Clientes
-                        </TabsTrigger> */}
-                    </TabsList>
+                <div className="flex items-center justify-between"> </div>
+                <div className='flex justify-between'>
 
-                    {activeTab === "Detalhes" && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="text-gray-900 font-bold text-3xl pb-5">Editar Sócio </div>
+                    <HelperDialog title='Editar Sócio'>
+                        <div>
                             <div>
-                                <Label htmlFor="nome" className="text-gray-700">Nome</Label>
-                                <Input id="nome" value={partner.nome} onChange={handleChange} className="bg-white text-gray-800" />
+                                <p><strong>Nome</strong>: Campo obrigatório. Insira o nome completo do sócio.</p>
                             </div>
 
                             <div>
-                                <Label htmlFor="email" className="text-gray-700">Email</Label>
-                                <Input id="email" value={partner.email} onChange={handleChange} className="bg-white text-gray-800" />
+                                <p><strong>Email</strong>: Campo obrigatório. Insira o endereço de e-mail do sócio. Certifique-se de que o e-mail está correto para possibilitar o contato.</p>
                             </div>
 
                             <div>
-                                <Label htmlFor="cpf" className="text-gray-700">CPF</Label>
-                                <Input id="cpf" value={partner.cpf} onChange={handleChange} className="bg-white text-gray-800" />
+                                <p><strong>CPF</strong>: Campo obrigatório. Insira o número do CPF do sócio. O CPF deve ser válido e não pode conter caracteres especiais (apenas números).</p>
                             </div>
 
                             <div>
-                                <Label htmlFor="tipo" className="text-gray-700">Tipo</Label>
-                                <Select
-                                    value={partner.tipo || undefined}
-                                    onValueChange={(value) => setPartner({ ...partner, tipo: value })}
-                                >
-                                    <SelectTrigger className="bg-white text-gray-800">
-                                        <SelectValue placeholder="Selecione o tipo" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {/* Opções válidas */}
-                                        <SelectItem value="admin">Administrador</SelectItem>
-                                        <SelectItem value="user">Comum</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div>
-                                <Label htmlFor="senha" className="text-gray-700">Senha</Label>
-                                <Input type="password" id="senha" value={partner.senha} onChange={handleChange} className="bg-white text-gray-800" />
+                                <p><strong>Tipo</strong>: Selecione o tipo de acesso do sócio (por exemplo, Administrador ou Usuário padrão). Isso definirá os privilégios de acesso.</p>
                             </div>
 
                             <div>
-                                <Label htmlFor="confirmarSenha" className="text-gray-700">Confirmar Senha</Label>
-                                <Input type="password" id="confirmarSenha" value={partner.confirmarSenha} onChange={handleChange} className="bg-white text-gray-800" />
+                                <p><strong>Senha</strong>: Campo obrigatório. Defina uma senha para o sócio. A senha deve atender aos critérios de segurança estabelecidos.</p>
+                            </div>
+
+                            <div>
+                                <p><strong>Confirmar Senha</strong>: Campo obrigatório. Confirme a senha para garantir que foi digitada corretamente.</p>
+                            </div>
+
+                            <div>
+                                <p><strong>Botões Cancelar e Salvar</strong>: Use o botão "Cancelar" para descartar alterações e retornar sem salvar. Clique em "Salvar" para registrar as informações inseridas.</p>
                             </div>
                         </div>
-                    )}
-                </Tabs>
+                    </HelperDialog>
+                </div>
+
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div>
+                        <Label htmlFor="nome" className="text-gray-700">Nome *</Label>
+                        <Input id="nome" value={partner.nome} onChange={handleChange} className="bg-white text-gray-800" />
+                    </div>
+
+                    <div>
+                        <Label htmlFor="email" className="text-gray-700">Email *</Label>
+                        <Input id="email" value={partner.email} onChange={handleChange} className="bg-white text-gray-800" />
+                    </div>
+
+                    <div>
+                        <Label htmlFor="cpf" className="text-gray-700">CPF *</Label>
+                        <Input id="cpf" value={partner.cpf} onChange={handleChange} className="bg-white text-gray-800" />
+                    </div>
+
+                    <div>
+                        <Label htmlFor="tipo" className="text-gray-700">Tipo *</Label>
+                        <Select
+                            value={partner.tipo || undefined}
+                            onValueChange={(value) => setPartner({ ...partner, tipo: value })}
+                        >
+                            <SelectTrigger className="bg-white text-gray-800">
+                                <SelectValue placeholder="Selecione o tipo" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="admin">Administrador</SelectItem>
+                                <SelectItem value="user">Comum</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div>
+                        <Label htmlFor="senha" className="text-gray-700">Senha *</Label>
+                        <Input type="password" id="senha" value={partner.senha} onChange={handleChange} className="bg-white text-gray-800" />
+                    </div>
+
+                    <div>
+                        <Label htmlFor="confirmarSenha" className="text-gray-700">Confirmar Senha *</Label>
+                        <Input type="password" id="confirmarSenha" value={partner.confirmarSenha} onChange={handleChange} className="bg-white text-gray-800" />
+                    </div>
+                </div>
+
 
                 <div className="mt-6 flex justify-end space-x-4">
                     <Button variant="outline" onClick={() => router.push(`/admin/partners/${params.partnerId}`)}>
