@@ -86,10 +86,3 @@ model Indice {
   investimentos Investimento[]
 }
 
-model ConsolidadoInvestimento {
-  id_consolidado String @id @default(uuid()) @db.Char(36)
-  valuation      Float
-  rent_bruta     Float
-  rent_objetivo  Float
-  rent_relativa  Float
-}

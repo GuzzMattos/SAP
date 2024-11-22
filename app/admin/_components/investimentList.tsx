@@ -6,6 +6,7 @@ import { EditIcon, Eye, TrashIcon } from "lucide-react";
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { getInvestimentsByClientId, getInvestimentById, TInvestimentsByClientId, TInvestimentById, deactivateInvestiment } from "@/app/_actions/investiment";
+import HelperDialog from '@/components/helper-dialog';
 
 interface IInvestmentsPage {
     clientId: string;
@@ -97,6 +98,22 @@ export default function InvestmentsPage({ clientId }: IInvestmentsPage) {
                         onChange={handleSearchChange}
                         className="w-full p-2 border rounded bg-slate-100 text-gray-700"
                     />
+
+                    {/* Adicionando HelperDialog ao lado do campo de busca */}
+                    <div className="ml-2">
+                        <HelperDialog title="Investimentos Ativos">
+                            <div>
+                                {/* Conteúdo do HelperDialog */}
+                                <p><strong>Buscar por Banco ou Classe</strong>: Permite localizar investimentos pelo nome do banco ou pela classe (ex.: fixa, variável).</p>
+                                <p><strong>Coluna "Banco"</strong>: Indica o nome da instituição financeira do investimento.</p>
+                                <p><strong>Coluna "Classe"</strong>: Identifica o tipo do investimento, como renda fixa ou variável.</p>
+                                <p><strong>Coluna "Data Aplicação"</strong>: Exibe a data de início do investimento.</p>
+                                <p><strong>Ações</strong>: Nesta coluna, você pode visualizar os detalhes ou excluir o investimento.</p>
+                                <p><strong>Botão "Adicionar Investimento"</strong>: Clique para incluir um novo investimento.</p>
+                                <p><strong>Botões "Anterior" e "Próximo"</strong>: Permitem navegar entre páginas de registros.</p>
+                            </div>
+                        </HelperDialog>
+                    </div>
                 </div>
 
                 {/* Cabeçalhos da tabela */}

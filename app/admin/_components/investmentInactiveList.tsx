@@ -6,6 +6,7 @@ import { ArrowBigUp, EditIcon, Eye, TrashIcon } from "lucide-react";
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { getInactiveInvestimentsByClientId, getInactiveInvestimentById, TInvestimentsByClientId, TInvestimentByIdInactive, activateInvestiment } from "@/app/_actions/investiment";
+import HelperDialog from '@/components/helper-dialog';
 
 interface IInvestmentsPage {
     clientId: string;
@@ -95,6 +96,31 @@ export default function InvestmentsInactivePage({ clientId }: IInvestmentsPage) 
                         onChange={handleSearchChange}
                         className="w-full p-2 border rounded bg-slate-100 text-gray-700"
                     />
+
+                    {/* HelperDialog para ajudar os usuários */}
+                    <div className="ml-2">
+                        <HelperDialog title="Investimentos Inativos">
+                            <div>
+                                <p>
+                                    <strong>Busca por Banco ou Classe:</strong> Permite localizar investimentos inativos pelo nome do banco ou pela classe (ex.: fixa, variável).
+                                </p>
+                                <p>
+                                    <strong>Coluna "Banco":</strong> Indica o nome da instituição financeira relacionada ao investimento.
+                                </p>
+                                <p>
+                                    <strong>Coluna "Classe":</strong> Exibe se o investimento é de renda fixa ou variável.
+                                </p>
+                                <p>
+                                    <strong>Coluna "Data Aplicação":</strong> Mostra a data em que o investimento foi realizado.
+                                </p>
+                                <p>
+                                    <strong>Ações:</strong> 
+                                    - O ícone <Eye className="inline-block w-4 h-4 text-gray-600" /> permite visualizar os detalhes do investimento.
+                                    - O ícone <ArrowBigUp className="inline-block w-4 h-4 text-green-600" /> reativa o investimento.
+                                </p>
+                            </div>
+                        </HelperDialog>
+                    </div>
                 </div>
 
                 {/* Cabeçalhos da tabela */}

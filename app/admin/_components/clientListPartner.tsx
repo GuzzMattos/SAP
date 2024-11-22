@@ -96,59 +96,9 @@ export default function ClientsPagePartner({ partnerId }: { partnerId: string })
     return (
         <main className="bg-gray-50 min-h-screen p-6 rounded relative">
             <div className="bg-white shadow-md rounded-lg overflow-hidden">
-
                 {/* Contêiner do título e HelperDialog */}
-                <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-
-
-                    {/* HelperDialog no canto superior direito */}
-                    {/*<HelperDialog title="Lista de Clientes Ativos">
-                        <div>
-                            <div>
-
-                                <div>
-                                    <p><strong>Buscar por nome ou CPF</strong>: Utilize este campo para buscar clientes ativos cadastrados pelo nome ou número de CPF. Digite parte do nome ou do CPF completo para que o sistema exiba resultados correspondentes.</p>
-                                </div>
-
-                                <div>
-                                    <p><strong>Nome</strong>: Coluna que exibe o nome dos clientes ativos cadastrados.</p>
-                                </div>
-
-                                <div>
-                                    <p><strong>CPF</strong>: Coluna que mostra o CPF dos clientes ativos cadastrados, permitindo uma identificação única de cada pessoa.</p>
-                                </div>
-
-                                <div>
-                                    <p><strong>Ações</strong>: Coluna onde são disponibilizadas as ações que podem ser realizadas com o cliente listado. Os ícones de edição e exclusão permitem atualizar ou remover o registro do cliente.</p>
-                                </div>
-
-                                <div>
-                                    <p><strong>Botão "Clientes Inativos"</strong>: Clique neste botão para alternar a visualização para a lista de clientes inativos.</p>
-                                </div>
-
-                                <div>
-                                    <p><strong>Botão "Adicionar Novo"</strong>: Clique neste botão para adicionar um novo cliente ativo. Você será redirecionado para uma página de cadastro onde poderá inserir todas as informações necessárias.</p>
-                                </div>
-
-                                <div>
-                                    <p><strong>Botão "Anterior"</strong>: Use este botão para navegar para a página anterior na lista de clientes ativos, caso haja vários registros.</p>
-                                </div>
-
-                                <div>
-                                    <p><strong>Botão "Próxima"</strong>: Use este botão para avançar para a próxima página na lista de clientes ativos, caso haja muitos registros.</p>
-                                </div>
-                                <div>
-                                    <p><strong>Botões "Anterior e Próxima"</strong>: Estes dois botões permitem que você navague pelas páginas da lista de clientes ativos.</p>
-                                </div>
-                            </div>
-
-                        </div>
-                    </HelperDialog>
+                <div className="p-4 border-b border-gray-200 flex items-center justify-between space-x-2">
                     {/* Campo de busca */}
-                </div>
-
-                <div className="p-4 border-b border-gray-200">
-
                     <input
                         type="text"
                         placeholder="Buscar por nome ou CPF"
@@ -156,8 +106,20 @@ export default function ClientsPagePartner({ partnerId }: { partnerId: string })
                         onChange={handleSearchChange}
                         className="w-full p-2 border rounded bg-slate-100 text-gray-700"
                     />
+                    {/* HelperDialog ao lado do campo de busca */}
+                    <HelperDialog title="Lista de Clientes do Sócio">
+                        <div>
+                            <p><strong>Buscar por nome ou CPF:</strong> Utilize este campo para buscar clientes ativos cadastrados pelo nome ou CPF.</p>
+                            <p><strong>Nome:</strong> Exibe o nome dos clientes cadastrados.</p>
+                            <p><strong>CPF:</strong> Exibe o CPF dos clientes, ajudando a identificar cada um de maneira única.</p>
+                            <p><strong>Ações:</strong> Inclui ícones para editar ou excluir clientes da lista.</p>
+                            <p><strong>Botões "Anterior" e "Próximo":</strong> Navega entre as páginas de clientes.</p>
+                        </div>
+                    </HelperDialog>
+                </div>
 
-                    {/* Cabeçalhos da tabela */}
+                {/* Cabeçalhos da tabela */}
+                <div className="p-4 border-b border-gray-200">
                     <div className="grid grid-cols-3 gap-4 text-gray-700 font-semibold mt-4">
                         <div className="justify-start text-start">Nome</div>
                         <div className="text-center">CPF</div>
@@ -194,8 +156,8 @@ export default function ClientsPagePartner({ partnerId }: { partnerId: string })
                                             className="p-1 rounded hover:bg-gray-200"
                                             onClick={() => {
                                                 setSelectedClientId(client.id_cliente);
-                                                setSelectedClientName(client.nome)
-                                                setDialogOpen(true); // Abre o diálogo quando clica em deletar
+                                                setSelectedClientName(client.nome);
+                                                setDialogOpen(true); // Abre o diálogo para exclusão
                                             }}
                                         >
                                             <TrashIcon className="w-5 h-5 text-red-600" />
@@ -220,9 +182,6 @@ export default function ClientsPagePartner({ partnerId }: { partnerId: string })
                         </div>
                     ))}
                 </div>
-
-                {/* Botão Adicionar Novo */}
-
 
                 {/* Paginação */}
                 <Pagination className="text-white p-2 rounded-lg">
@@ -259,5 +218,5 @@ export default function ClientsPagePartner({ partnerId }: { partnerId: string })
                 </Pagination>
             </div>
         </main>
-    )
+    );
 }

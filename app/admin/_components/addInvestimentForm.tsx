@@ -261,7 +261,7 @@ export default function InvestimentForm({ clientId, indice }: IInvestimentForm) 
                             name="setor_ativ"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-gray-800 flex">Setor de Atividade<div className="text-red-600">*</div></FormLabel>
+                                    <FormLabel className="text-gray-800 flex">Setor de Atividade </FormLabel>
                                     <FormControl>
                                         <Input
                                             placeholder="Setor de Atividade"
@@ -279,7 +279,7 @@ export default function InvestimentForm({ clientId, indice }: IInvestimentForm) 
                             name="liquidez"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-gray-800 flex">Liquidez<div className="text-red-600">*</div></FormLabel>
+                                    <FormLabel className="text-gray-800 flex">Liquidez</FormLabel>
                                     <FormControl>
                                         <Input
                                             placeholder="Liquidez"
