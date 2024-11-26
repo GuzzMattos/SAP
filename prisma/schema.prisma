@@ -57,26 +57,27 @@ model Familiar {
 }
 
 model Investimento {
-  id_invest      String   @id @unique @default(uuid()) @db.Char(36)
-  id_cliente     String   @db.Char(36)
-  cliente        Cliente  @relation(fields: [id_cliente], references: [id_cliente])
-  banco          String   @db.VarChar(40)
-  agencia        String   @db.VarChar(15)
-  conta          String   @db.VarChar(17)
-  classe         String   @db.VarChar(50)
-  sub_classe_atv String   @db.VarChar(30)
-  setor_ativ     String   @db.VarChar(50)
-  liquidez       String   @db.VarChar(20)
-  data_aplic     DateTime
-  data_venc      DateTime
-  porc_indice    Float
-  pre_fixado     Float
-  isento         Boolean
-  pais           String   @db.VarChar(30)
-  valor          Float
-  id_indice      String
-  indice         Indice   @relation(fields: [id_indice], references: [id_indice])
-  ativo          Boolean
+  id_invest        String            @id @unique @default(uuid()) @db.Char(36)
+  id_cliente       String            @db.Char(36)
+  cliente          Cliente           @relation(fields: [id_cliente], references: [id_cliente])
+  banco            String            @db.VarChar(40)
+  agencia          String            @db.VarChar(15)
+  conta            String            @db.VarChar(17)
+  classe           String            @db.VarChar(50)
+  sub_classe_atv   String            @db.VarChar(30)
+  setor_ativ       String            @db.VarChar(50)
+  liquidez         String            @db.VarChar(20)
+  data_aplic       DateTime
+  data_venc        DateTime
+  porc_indice      Float
+  pre_fixado       Float
+  isento           Boolean
+  pais             String            @db.VarChar(30)
+  valor            Float
+  id_indice        String
+  indice           Indice            @relation(fields: [id_indice], references: [id_indice])
+  ativo            Boolean
+  logInvestimentos LogInvestimento[] // Relacionamento de um para muitos (um investimento pode ter vários logs)
 }
 
 model Indice {
@@ -86,3 +87,11 @@ model Indice {
   investimentos Investimento[]
 }
 
+model LogInvestimento {
+  id_log         String       @id @unique @default(uuid()) @db.Char(36)
+  id_invest      String       @db.Char(36)
+  investimento   Investimento @relation(fields: [id_invest], references: [id_invest])
+  valor_anterior Float
+  valor_atual    Float
+  data_criacao   DateTime     @default(now())
+}

@@ -151,7 +151,7 @@ export default function AddClientForm({ partners }: IClientForm) {
                                     <FormControl>
                                         <Input
                                             type="email"
-                                            placeholder="Nome"
+                                            placeholder="email@email.com"
                                             className="border-gray-300 bg-gray-100 text-gray-800"
                                             {...field}
                                         />

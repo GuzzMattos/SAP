@@ -16,7 +16,10 @@ export const InvestimentSchema = z.object({
     pre_fixado: z.number().min(0, { message: "Pré-Fixado deve ser um número positivo" }),
     isento: z.boolean(),
     pais: z.string().min(1, { message: "País é obrigatório" }).max(30, { message: "País deve ter no máximo 30 caracteres" }),
-    valor: z.number().min(0, { message: "Valor deve ser um número positivo" }),
+    valor: z
+        .string()
+        .regex(/^\d+(,\d{1,2})?$/, { message: "Valor deve estar no formato correto, ex: 1000,00" })
+        .transform((val) => parseFloat(val.replace(",", "."))), // Converte para número
     ativo: z.boolean(),
 });
 

@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/chart";
 import { getIndiceValorById } from "@/app/_actions/indice";
 import HelperDialog from "@/components/helper-dialog";
+import HelperDialogWhite from "@/components/helper-white";
 
 export default function DashboardPage() {
   const [clientes, setClientes] = useState<TClient>([]);
@@ -117,7 +118,7 @@ export default function DashboardPage() {
       try {
         const dados = await getAllClients();
         // Ordenar os clientes em ordem alfabética pelo nome
-        const clientesOrdenados = dados.sort((a, b) => 
+        const clientesOrdenados = dados.sort((a, b) =>
           a.nome.localeCompare(b.nome)
         );
         setClientes(clientesOrdenados);
@@ -152,7 +153,8 @@ export default function DashboardPage() {
           // Calcula o valor ponderado para cada investimento com base nos índices e na taxa pré-fixada
           const rentBruta = investments.reduce((acc, investimento, index) => {
             // Ajuste do índice e pre-fixado como porcentagens
-            const valorIndiceAjustado = indicesValores[index] * (investimento.porc_indice / 100);
+            const valorIndiceAjustado = (((((indicesValores[index]) / 100) + 1) ** (1 / 12)) - 1) * (investimento.porc_indice / 100);
+
             const valorPreFixado = ((((((investimento.pre_fixado / 100) + 1) ** (1 / 12)) - 1)));
 
             // Calcula a rentabilidade ponderada do investimento
@@ -224,71 +226,91 @@ export default function DashboardPage() {
             ))}
           </SelectContent>
         </Select>
-  
-        {/* HelperDialog */}
-        <HelperDialog title="Ajuda - Dashboard de Investimentos">
-          <div>
-            <p>
-              <strong>Selecione um cliente:</strong> Use o menu suspenso para escolher o cliente cujas informações de investimento deseja visualizar.
-            </p>
-            <p>
-              <strong>Valuation:</strong> Mostra o valor total dos investimentos do cliente. Certifique-se de que as aplicações estão devidamente cadastradas para calcular o valor total.
-            </p>
-            <p>
-              <strong>Rentabilidade Bruta:</strong> Exibe a rentabilidade acumulada em relação ao total investido.
-            </p>
-            <p>
-              <strong>Rentabilidade Objetivo:</strong> Indica a meta de rentabilidade definida para o cliente.
-            </p>
-            <p>
-              <strong>Rentabilidade Relativa:</strong> Mostra a diferença entre a rentabilidade bruta e a meta de rentabilidade.
-            </p>
-            <p>
-              <strong>Gráficos:</strong>
-              <ul className="list-disc ml-6">
-                <li><strong>Ativos:</strong> Distribuição das aplicações em diferentes tipos de ativos (CDB, LCI/LCA, Ações, etc.).</li>
-                <li><strong>Bancos:</strong> Distribuição dos investimentos em instituições financeiras (XP, C6, Itaú, etc.).</li>
-              </ul>
-            </p>
-          </div>
-        </HelperDialog>
+        <div className="pl-5 text-white" >
+          <HelperDialogWhite title="Ajuda - Dashboard de Investimentos">
+            <div>
+              <p>
+                <strong>Selecione um cliente:</strong> Use o menu suspenso para escolher o cliente cujas informações de investimento deseja visualizar.
+              </p>
+              <p>
+                <strong>Valuation:</strong> Mostra o valor total dos investimentos do cliente. Certifique-se de que as aplicações estão devidamente cadastradas para calcular o valor total.
+              </p>
+              <p>
+                <strong>Rentabilidade Bruta:</strong> Exibe a rentabilidade acumulada em relação ao total investido.
+              </p>
+              <p>
+                <strong>Rentabilidade Objetivo:</strong> Indica a meta de rentabilidade definida para o cliente.
+              </p>
+              <p>
+                <strong>Rentabilidade Relativa:</strong> Mostra a diferença entre a rentabilidade bruta e a meta de rentabilidade.
+              </p>
+              <p>
+                <strong>Gráficos:</strong>
+                <ul className="list-disc ml-6">
+                  <li><strong>Ativos:</strong> Distribuição das aplicações em diferentes tipos de ativos (CDB, LCI/LCA, Ações, etc.).</li>
+                  <li><strong>Bancos:</strong> Distribuição dos investimentos em instituições financeiras (XP, C6, Itaú, etc.).</li>
+                </ul>
+              </p>
+            </div>
+          </HelperDialogWhite>
+        </div>
       </div>
-  
+
       {/* Painéis principais */}
       <div className="flex gap-8 w-full mt-8">
         <div className="bg-white rounded-lg shadow-md p-10 flex-1 min-w-[300px] text-center">
           <h2 className="text-gray-500 mb-2">Investimentos</h2>
           <h3 className="text-black text-2xl font-bold mb-4">Valuation</h3>
-          <p className="text-blue-500 text-3xl font-semibold">R${totalInvestimentos.toFixed(2)}</p>
+          <p className="text-blue-500 text-3xl font-semibold">
+            R$
+            {new Intl.NumberFormat("pt-BR", {
+              style: "decimal",
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(totalInvestimentos)}
+          </p>
           <p className="text-gray-500 mt-4">dividido em</p>
           <p className="text-blue-500 text-3xl font-semibold">{numInvestimentos}</p>
           <p className="text-gray-500">aplicações</p>
         </div>
-  
+
         <div className="bg-white rounded-lg shadow-md p-10 flex-1 min-w-[300px] text-center">
           <div className="flex justify-between mb-4">
             <div>
               <p className="text-gray-500">Rentabilidade Bruta</p>
-              <p className="text-red-500 text-5xl font-bold">{rentBruta ? `${rentBruta}%` : '0%'}</p>
+              <p className={`text-5xl font-bold ${cdiValue && rentBruta
+                ? (Number(rentBruta) > Number(cdiValue))
+                  ? 'text-green-500'
+                  : 'text-red-500'
+                : 'text-red-500'
+                }`}>  {rentBruta ? `${rentBruta}%` : '0%'}</p>
             </div>
             <div>
               <p className="text-gray-500">Rentabilidade Objetivo</p>
-              <p className="text-blue-500 text-5xl font-bold">{cdiValue !== null ? `${(((((cdiValue) + 1) ** 12) - 1) * 100).toFixed(2)}%` : 'Carregando...'}</p>
+              <p className="text-blue-500 text-5xl font-bold">{cdiValue !== null ? `${(cdiValue).toFixed(2)}%` : 'Carregando...'}</p>
             </div>
           </div>
-  
+
           <div className="mt-4 pt-8">
             <p className="text-gray-500">Rentabilidade Relativa</p>
-            <p className="text-red-500 text-5xl font-bold">{cdiValue && rentBruta
-              ? `${(
-                (Number(rentBruta) - ((((Number(cdiValue)) + 1) ** 12 - 1) * 100)) /
-                ((((Number(cdiValue)) + 1) ** 252 - 1) * 100)
-              ).toFixed(2)}%`
-              : '0%'}</p>
+            <p
+              className={`text-5xl font-bold ${cdiValue && rentBruta
+                ? (Number(rentBruta) - Number(cdiValue)) / Number(cdiValue) >= 0
+                  ? 'text-green-500'
+                  : 'text-red-500'
+                : 'text-red-500'
+                }`}
+            >
+              {cdiValue && rentBruta
+                ? `${(
+                  ((Number(rentBruta) - Number(cdiValue)) / Number(cdiValue)) * 100
+                ).toFixed(2)}%`
+                : '0%'}
+            </p>
           </div>
         </div>
       </div>
-  
+
       {/* Gráficos */}
       <div className="flex gap-8 w-full mt-8">
         <Card className="flex-1 min-w-[300px]">
@@ -311,7 +333,7 @@ export default function DashboardPage() {
             </ChartContainer>
           </CardContent>
         </Card>
-  
+
         <Card className="flex-1 min-w-[300px]">
           <CardHeader className="items-center pb-0">
             <CardTitle>Bancos</CardTitle>
@@ -334,4 +356,5 @@ export default function DashboardPage() {
         </Card>
       </div>
     </main>
-  );}
+  );
+}

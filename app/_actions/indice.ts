@@ -51,3 +51,40 @@ export async function getIndiceValorById(id_indice: string) {
 
     return indice.valor;
 }
+
+
+
+
+export async function updateCdiValue(value: number): Promise<void> {
+    try {
+        await prisma.indice.update({
+            where: { nome: 'CDI' }, // Certifique-se de que o nome 'CDI' está correto no banco de dados
+            data: { valor: value },
+        });
+        console.log(`Valor do CDI atualizado para ${value}.`);
+    } catch (error) {
+        console.error('Erro ao atualizar o valor do CDI no banco de dados:', error);
+    }
+}
+export async function updateSelicValue(value: number): Promise<void> {
+    try {
+        await prisma.indice.update({
+            where: { nome: 'SELIC' }, // Certifique-se de que o nome 'SELIC' está correto no banco de dados
+            data: { valor: value },
+        });
+        console.log(`Valor do SELIC atualizado para ${value}.`);
+    } catch (error) {
+        console.error('Erro ao atualizar o valor do SELIC no banco de dados:', error);
+    }
+}
+export async function updateIpcaValue(value: number): Promise<void> {
+    try {
+        await prisma.indice.update({
+            where: { nome: 'IPCA' }, // Certifique-se de que o nome 'IPCA' está correto no banco de dados
+            data: { valor: value },
+        });
+        console.log(`Valor do IPCA atualizado para ${value}.`);
+    } catch (error) {
+        console.error('Erro ao atualizar o valor do IPCA no banco de dados:', error);
+    }
+}

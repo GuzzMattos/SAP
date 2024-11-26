@@ -23,6 +23,7 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import RouterBackButton from "@/components/router-back-button";
+import NumberFormat from "react-number-format";
 
 
 
@@ -506,27 +507,43 @@ export default function InvestimentForm({ clientId, indice }: IInvestimentForm) 
                                 </FormItem>
                             )}
                         />
-
                         <FormField
                             control={form.control}
                             name="valor"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-gray-800 flex">Valor<div className="text-red-600">*</div></FormLabel>
+                                    <FormLabel className="text-gray-800 flex">
+                                        Valor<div className="text-red-600">*</div>
+                                    </FormLabel>
                                     <FormControl>
                                         <Input
-                                            type="number"
-                                            step="0.01"
+                                            type="text"
                                             placeholder="Valor"
                                             className="border-gray-300 bg-gray-100 text-gray-800"
-                                            value={field.value !== undefined ? String(field.value) : ""}
-                                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                            value={field.value || ""}
+                                            onChange={(e) => {
+                                                let value = e.target.value;
+
+                                                // Remove caracteres não numéricos, exceto vírgula
+                                                value = value.replace(/[^0-9,]/g, "");
+
+                                                // Permite apenas dois dígitos após a vírgula
+                                                if (value.includes(",")) {
+                                                    const [integer, decimal] = value.split(",");
+                                                    value = `${integer},${decimal.slice(0, 2)}`;
+                                                }
+
+                                                // Atualiza o valor
+                                                field.onChange(value);
+                                            }}
                                         />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
-                        />
+                        />;
+
+
 
 
                         <div className="flex justify-center">

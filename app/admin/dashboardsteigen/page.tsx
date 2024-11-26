@@ -147,7 +147,7 @@ export default function DashboardPage() {
                 // Calcula o valor ponderado para cada investimento com base nos índices e na taxa pré-fixada
                 const rentBruta = investments.reduce((acc, investimento, index) => {
                     // Ajuste do índice e pre-fixado como porcentagens
-                    const valorIndiceAjustado = indicesValores[index] * (investimento.porc_indice / 100);
+                    const valorIndiceAjustado = (((((indicesValores[index]) / 100) + 1) ** (1 / 12)) - 1) * (investimento.porc_indice / 100);
                     const valorPreFixado = ((((((investimento.pre_fixado / 100) + 1) ** (1 / 12)) - 1)));
 
                     // Calcula a rentabilidade ponderada do investimento
@@ -215,7 +215,14 @@ export default function DashboardPage() {
                 <div className="bg-white rounded-lg shadow-md p-10 flex-1 min-w-[300px] text-center">
                     <h2 className="text-gray-500 mb-2">Investimentos</h2>
                     <h3 className="text-black text-2xl font-bold mb-4">Valuation</h3>
-                    <p className="text-blue-500 text-3xl font-semibold">R${totalInvestimentos.toFixed(2)}</p>
+                    <p className="text-blue-500 text-3xl font-semibold">
+                        R$
+                        {new Intl.NumberFormat("pt-BR", {
+                            style: "decimal",
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                        }).format(totalInvestimentos)}
+                    </p>
                     <p className="text-gray-500 mt-4">dividido em</p>
                     <p className="text-blue-500 text-3xl font-semibold">{numInvestimentos}</p>
                     <p className="text-gray-500">aplicações</p>
@@ -227,22 +234,35 @@ export default function DashboardPage() {
                     <div className="flex justify-between mb-4">
                         <div>
                             <p className="text-gray-500">Rentabilidade Bruta</p>
-                            <p className="text-red-500 text-5xl font-bold">  {rentBruta ? `${rentBruta}%` : '0%'}</p>
+                            <p className={`text-5xl font-bold ${cdiValue && rentBruta
+                                ? (Number(rentBruta) > Number(cdiValue))
+                                    ? 'text-green-500'
+                                    : 'text-red-500'
+                                : 'text-red-500'
+                                }`}>  {rentBruta ? `${rentBruta}%` : '0%'}</p>
                         </div>
                         <div>
                             <p className="text-gray-500">Rentabilidade Objetivo</p>
-                            <p className="text-blue-500 text-5xl font-bold">{cdiValue !== null ? `${(((((cdiValue) + 1) ** 12) - 1) * 100).toFixed(2)}%` : 'Carregando...'}</p>
+                            <p className="text-blue-500 text-5xl font-bold">{cdiValue !== null ? `${(cdiValue).toFixed(2)}%` : 'Carregando...'}</p>
                         </div>
                     </div>
 
                     <div className="mt-4 pt-8">
                         <p className="text-gray-500">Rentabilidade Relativa</p>
-                        <p className="text-red-500 text-5xl font-bold">{cdiValue && rentBruta
-                            ? `${(
-                                (Number(rentBruta) - ((((Number(cdiValue)) + 1) ** 12 - 1) * 100)) /
-                                ((((Number(cdiValue)) + 1) ** 252 - 1) * 100)
-                            ).toFixed(2)}%`
-                            : '0%'}</p>
+                        <p
+                            className={`text-5xl font-bold ${cdiValue && rentBruta
+                                ? (Number(rentBruta) - Number(cdiValue)) / Number(cdiValue) >= 0
+                                    ? 'text-green-500'
+                                    : 'text-red-500'
+                                : 'text-red-500'
+                                }`}
+                        >
+                            {cdiValue && rentBruta
+                                ? `${(
+                                    ((Number(rentBruta) - Number(cdiValue)) / Number(cdiValue)) * 100
+                                ).toFixed(2)}%`
+                                : '0%'}
+                        </p>
                     </div>
                 </div>
             </div>

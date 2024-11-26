@@ -1,16 +1,12 @@
 import cron from 'node-cron';
 import prisma from '@/lib/db';
-export async function updateInvestimentsByIndice() {
+import { getInvestimentsToAtt, updateInvestiment } from '../_actions/investiment';
+import { updateCdiValue, updateIpcaValue, updateSelicValue } from '../_actions/indice';
+import axios from 'axios';
+export async function updateInvestimentsAndIndexDaily() {
+
     // Busca todos os investimentos e inclui o valor do índice relacionado a cada um
-    const investiments = await prisma.investimento.findMany({
-        include: {
-            indice: {
-                select: {
-                    valor: true,
-                },
-            },
-        },
-    });
+    const investiments = await getInvestimentsToAtt()
 
     // Itera sobre cada investimento e calcula o novo valor
     for (const investiment of investiments) {
@@ -23,127 +19,131 @@ export async function updateInvestimentsByIndice() {
             // Calcula o novo valor com base na fórmula especificada
             const novoValor =
                 (valor *
-                    ((((valorIndice) * (porc_indice / 100) + ((pre_fixado / 100 + 1) ** (1 / 12) - 1)) + 1)));
+                    ((((((((valorIndice) * (porc_indice / 100)) + pre_fixado) / 100 + 1) ** (1 / 252) - 1)) + 1)));
             // Atualiza o investimento com o novo valor calculado
-            await prisma.investimento.update({
-                where: { id_invest: investiment.id_invest },
-                data: { valor: novoValor },
-            });
+            updateInvestiment(investiment.id_invest, novoValor)
+
+
+
         }
+
+
+        console.log("Valores de todos os investimentos atualizados com base no índice.");
     }
 
-    console.log("Valores de todos os investimentos atualizados com base no índice.");
 }
-// Função para buscar o valor da API para o dia 1 do mês atual
-async function fetchIndiceValueForFirstOfMonth() {
-    const today = new Date();
-    const firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    const formattedDate = firstOfMonth.toLocaleDateString('pt-BR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-    });
+async function fetchIpcasSumLast12Months(): Promise<number | null> {
+    const apiUrl = 'http://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados?formato=json';
 
-    const response = await fetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.11/dados?formato=json');
-    const data = await response.json();
-
-    // Filtrar o valor correspondente ao primeiro dia do mês
-    const firstOfMonthData = data.find((entry: { data: string; valor: string }) => entry.data === formattedDate);
-    if (!firstOfMonthData) {
-        console.warn(`Nenhum valor encontrado para a data ${formattedDate}.`);
-        return null; // Retorna null para tratamento de fallback
-    }
-
-    return parseFloat(firstOfMonthData.valor);
-}
-
-// Função para verificar se o índice CDI existe
-async function indiceCDIExists() {
-    const indice = await prisma.indice.findUnique({
-        where: { nome: 'CDI' },
-    });
-    return !!indice; // Retorna true se o índice existir, false caso contrário
-}
-async function indiceSELICExists() {
-    const indice = await prisma.indice.findUnique({
-        where: { nome: 'SELIC' },
-    });
-    return !!indice; // Retorna true se o índice existir, false caso contrário
-}
-async function updateIndiceSELIC() {
     try {
-        const valorPrimeiroDoMes = await fetchIndiceValueForFirstOfMonth();
+        const response = await axios.get(apiUrl);
+        const data: { data: string; valor: string }[] = response.data;
 
-        // Verifica se obteve um valor da API; caso contrário, mantém o valor existente
-        if (valorPrimeiroDoMes !== null) {
-            const indiceExiste = await indiceSELICExists();
-            const selicatualizada = parseFloat((((((((valorPrimeiroDoMes / 100) + 1) ** 21) - 1)) + (0.00008)) / 100).toFixed(6));
-
-
-            if (indiceExiste) {
-                const updatedIndice = await prisma.indice.update({
-                    where: { nome: "SELIC" },
-                    data: { valor: selicatualizada },
-                });
-                console.log("Índice SELIC atualizado com sucesso:", updatedIndice);
-            } else {
-                console.log("Índice SELIC não encontrado, criando um novo índice.");
-                const novoIndice = await prisma.indice.create({
-                    data: {
-                        nome: "SELIC",
-                        valor: valorPrimeiroDoMes,
-                    },
-                });
-                console.log("Índice SELIC criado com sucesso:", novoIndice);
-            }
-        } else {
-            console.log("Nenhum valor disponível na API para o primeiro dia do mês.");
+        if (data.length === 0) {
+            console.warn('Nenhuma cotação disponível.');
+            return null;
         }
+
+        // Obter a data atual
+        const today = new Date();
+
+        // Filtrar as entradas dos últimos 12 meses
+        const last12MonthsData = data.filter((entry) => {
+            const entryDate = new Date(entry.data.split('/').reverse().join('-'));
+            const twelveMonthsAgo = new Date(today);
+            twelveMonthsAgo.setMonth(today.getMonth() - 13);
+
+            return entryDate >= twelveMonthsAgo && entryDate <= today;
+        });
+
+        if (last12MonthsData.length === 0) {
+            console.warn('Nenhum dado disponível para os últimos 12 meses.');
+            return null;
+        }
+
+        // Somar os valores dos últimos 12 meses
+        const total = last12MonthsData.reduce((sum, entry) => {
+            return sum + parseFloat(entry.valor);
+        }, 0);
+
+        return total;
     } catch (error) {
-        console.error("Erro ao atualizar ou criar o índice SELIC:", error);
+        console.error('Erro ao buscar o IPCA da API:', error);
+        return null;
     }
 }
+async function fetchCdiValue(): Promise<number | null> {
+    const apiUrl = 'https://api.bcb.gov.br/dados/serie/bcdata.sgs.11/dados?formato=json';
 
-// Função para atualizar o índice CDI com o valor do dia 1º do mês
-async function updateIndiceCDI() {
     try {
-        const valorPrimeiroDoMes = await fetchIndiceValueForFirstOfMonth();
+        const response = await axios.get(apiUrl);
+        const data: { data: string; valor: string }[] = response.data;
 
-        // Verifica se obteve um valor da API; caso contrário, mantém o valor existente
-        if (valorPrimeiroDoMes !== null) {
-            const indiceExiste = await indiceCDIExists();
-
-            if (indiceExiste) {
-                const updatedIndice = await prisma.indice.update({
-                    where: { nome: "CDI" },
-                    data: { valor: parseFloat((((((valorPrimeiroDoMes / 100) + 1) ** 21) - 1)).toFixed(6)) },
-                });
-                console.log("Índice CDI atualizado com sucesso:", updatedIndice);
-            } else {
-                console.log("Índice CDI não encontrado, criando um novo índice.");
-                const novoIndice = await prisma.indice.create({
-                    data: {
-                        nome: "CDI",
-                        valor: valorPrimeiroDoMes,
-                    },
-                });
-                console.log("Índice CDI criado com sucesso:", novoIndice);
-            }
-        } else {
-            console.log("Nenhum valor disponível na API para o primeiro dia do mês.");
+        if (data.length === 0) {
+            console.warn('Nenhuma cotação disponível.');
+            return null;
         }
+
+        // Ordena as datas em ordem decrescente
+        const sortedData = data.sort((a, b) => {
+            const dateA = new Date(a.data.split('/').reverse().join('-'));
+            const dateB = new Date(b.data.split('/').reverse().join('-'));
+            return dateB.getTime() - dateA.getTime();
+        });
+
+        // Pega a data mais recente
+        const latestEntry = sortedData[0];
+
+        if (!latestEntry || !latestEntry.valor) {
+            console.warn('Nenhuma cotação válida encontrada.');
+            return null;
+        }
+
+        const cdiValue = parseFloat(latestEntry.valor);
+        const cdiAnual = (((((cdiValue / 100) + 1) ** 252) - 1) * 100)
+        return cdiAnual;
     } catch (error) {
-        console.error("Erro ao atualizar ou criar o índice CDI:", error);
+        console.error('Erro ao buscar o CDI da API:', error);
+        return null;
+    }
+}
+async function fetchAndUpdateCdi() {
+    const cdiValue = await fetchCdiValue();
+
+    if (cdiValue !== null) {
+        await updateCdiValue(cdiValue);
+    } else {
+        console.warn('Valor do CDI não encontrado, operação abortada.');
+    }
+}
+async function fetchAndUpdateSelic() {
+    const cdiValue = await fetchCdiValue();
+
+    if (cdiValue !== null) {
+        await updateSelicValue(cdiValue + 0.1);
+    } else {
+        console.warn('Valor da SELIC não encontrado, operação abortada.');
+    }
+}
+async function fetchAndUpdateIpca() {
+    const ipcaValue = await fetchIpcasSumLast12Months();
+
+    if (ipcaValue !== null) {
+        await updateIpcaValue(ipcaValue);
+    } else {
+        console.warn('Valor do IPCA não encontrado, operação abortada.');
     }
 }
 
 
-// Agendando a tarefa para o dia 1 de cada mês às 00:00
-cron.schedule('0 0 1 * *', () => {
-    console.log("Executando tarefa mensal...");
-    updateIndiceCDI()
-    updateIndiceSELIC();
-    updateInvestimentsByIndice()
+cron.schedule('0 0 * * *', () => {
+    console.log("Executando tarefa diária...");
+    fetchAndUpdateCdi()
+    fetchAndUpdateSelic()
+    fetchAndUpdateIpca()
+    updateInvestimentsAndIndexDaily()
+
+
 });
 
-console.log('Tarefa agendada para rodar todo dia 1 do mês.');
+console.log('Tarefa agendada para rodar todo dia.');

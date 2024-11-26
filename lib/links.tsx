@@ -1,4 +1,4 @@
-import { ChartLine, Handshake, Users } from "lucide-react";
+import { ChartLine, Handshake, Users, TrendingDown } from "lucide-react";
 
 // https://lucide.dev/icons/
 
@@ -40,6 +40,12 @@ const adminLinks: TLink[] = [
     title: 'Sócios',
     url: '/admin/partners',
     icon: <Handshake />,
+    allowedRoles: ['admin']
+  },
+  {
+    title: 'Índices',
+    url: '/admin/indices',
+    icon: <TrendingDown />,
     allowedRoles: ['admin']
   }
 ];

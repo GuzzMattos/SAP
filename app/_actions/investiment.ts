@@ -4,6 +4,7 @@ import { InvestimentSchema } from "@/lib/schemas/investiment";
 import { z } from "zod";
 import prisma from "@/lib/db";
 import { redirect } from "next/navigation";
+import { createInvestmentLog } from "./investimentlog";
 
 // Função para criar um novo Investiment
 export async function createInvestiment(clientId: string, values: z.infer<typeof InvestimentSchema>) {
@@ -15,8 +16,8 @@ export async function createInvestiment(clientId: string, values: z.infer<typeof
             conta: values.conta,
             classe: values.classe,
             sub_classe_atv: values.sub_classe_atv,
-            setor_ativ: values.setor_ativ,
-            liquidez: values.liquidez,
+            setor_ativ: values.setor_ativ ?? "",
+            liquidez: values.liquidez ?? "",
             data_aplic: new Date(values.data_aplic),
             data_venc: new Date(values.data_venc),
             porc_indice: values.porc_indice,
@@ -60,6 +61,20 @@ export async function getAllInvestiments() {
 
     return allInvestiments;
 }
+
+export async function getInvestimentsToAtt() {
+    const investimentsToAtt = await prisma.investimento.findMany({
+        include: {
+            indice: {
+                select: {
+                    valor: true,
+                },
+            },
+        },
+    });
+    return investimentsToAtt;
+}
+
 
 
 export type TInvestiment = Awaited<ReturnType<typeof getAllInvestiments>>;
@@ -161,6 +176,7 @@ export async function deactivateInvestiment(investmentId: string) {
     return updatedInvestment;
 }
 
+
 // Função para ativar um investimento
 export async function activateInvestiment(investmentId: string) {
     const updatedInvestment = await prisma.investimento.update({
@@ -247,4 +263,32 @@ export async function getInvestmentsByPartner(partnerId: string) {
     });
 
     return investments;
+}
+
+
+export async function updateInvestiment(investmentId: string, novoValor: number) {
+    const investment = await prisma.investimento.findUnique({
+        where: {
+            id_invest: investmentId,
+        },
+    });
+
+    if (!investment) {
+        throw new Error("Investimento não encontrado");
+    }
+
+    // Cria o log antes de atualizar
+    await createInvestmentLog(investmentId, investment.valor, novoValor);
+
+    const updatedInvestment = await prisma.investimento.update({
+
+        where: {
+            id_invest: investmentId, // Localiza o investimento pelo ID
+        },
+        data: {
+            valor: novoValor, // Define o status como inativo
+        },
+    });
+
+    return updatedInvestment;
 }
